@@ -1,0 +1,29 @@
+plugins {
+    id("com.github.rodm.teamcity-server") version "1.0"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.2.50"
+    id("org.jetbrains.kotlin.plugin.jpa") version "1.2.50"
+}
+
+teamcity {
+    version = teamcityVersion
+
+    server {
+        descriptor = project.file('teamcity-plugin.xml')
+        tokens = [Version: versionNumber]
+    }
+}
+
+serverPlugin.version = null
+
+dependencies {
+    provided project(':teamcity-netease-cloud-common')
+    server project(':teamcity-netease-cloud-common')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion"
+
+    provided "org.jetbrains.teamcity:cloud-interface:$teamcityVersion"
+    provided "org.jetbrains.teamcity:cloud-shared:$teamcityVersion"
+    provided "org.jetbrains.teamcity.internal:server:$teamcityVersion"
+}
+
+kotlin { experimental { coroutines 'enable' } }
