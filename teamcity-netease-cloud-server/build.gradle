@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.spring") version "1.2.50"
     id("org.jetbrains.kotlin.plugin.jpa") version "1.2.50"
 }
+apply plugin: 'java'
 
 teamcity {
     version = teamcityVersion
@@ -16,7 +17,7 @@ teamcity {
 serverPlugin.version = null
 
 dependencies {
-    provided project(':teamcity-netease-cloud-common')
+    compile project(':teamcity-netease-cloud-common')
     server project(':teamcity-netease-cloud-common')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion"
