@@ -7,4 +7,5 @@ teamcity {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile 'com.squareup.okhttp3:okhttp:3.10.0'
 }
