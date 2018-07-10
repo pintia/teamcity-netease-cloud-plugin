@@ -2,10 +2,7 @@ package com.hlyue.teamcity.agent.netease
 
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.controllers.BasePropertiesBean
-import jetbrains.buildServer.serverSide.AgentDescription
-import jetbrains.buildServer.serverSide.PropertiesProcessor
-import jetbrains.buildServer.serverSide.ServerPaths
-import jetbrains.buildServer.serverSide.ServerSettings
+import jetbrains.buildServer.serverSide.*
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import org.springframework.stereotype.Component
 
@@ -19,7 +16,7 @@ class NeteaseCloudClientFactory(
 
   companion object : Constants()
 
-  private val propertiesBean = BasePropertiesBean(null)
+  private val logger = buildLogger()
 
   init {
     cloudRegistrar.registerCloudFactory(this)
@@ -40,7 +37,13 @@ class NeteaseCloudClientFactory(
   }
 
   override fun createNewClient(state: CloudState, params: CloudClientParameters): CloudClientEx {
-    return NeteaseCloudClient(propertiesBean.properties[PREFERENCE_MACHINE_TYPE])
+    params.listParameterNames().forEach {
+      logger.info("param $it: ${params.getParameter(it)}")
+    }
+
+    return NeteaseCloudClient(params.getParameter(PREFERENCE_MACHINE_TYPE)!!,
+      params.getParameter(PREFERENCE_ACCESS_KEY)!!,
+      params.getParameter(PREFERENCE_ACCESS_SECRET)!!)
   }
 
   override fun getCloudCode(): String = CLOUD_CODE

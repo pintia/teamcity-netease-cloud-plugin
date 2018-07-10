@@ -1,6 +1,7 @@
 package com.hlyue.teamcity.agent.netease;
 
 import jetbrains.buildServer.controllers.BasePropertiesBean;
+import jetbrains.buildServer.serverSide.crypt.RSACipher;
 
 import java.util.Map;
 

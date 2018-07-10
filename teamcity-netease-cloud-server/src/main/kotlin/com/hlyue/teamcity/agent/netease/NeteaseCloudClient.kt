@@ -3,9 +3,11 @@ package com.hlyue.teamcity.agent.netease
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.serverSide.AgentDescription
 
-class NeteaseCloudClient(private val specType: String?): CloudClientEx {
+class NeteaseCloudClient(private val specType: String,
+                         private val accessKey: String,
+                         private val accessSecret: String): CloudClientEx {
 
-  val image = if (specType != null) NeteaseCloudImage(specType) else null
+  val image = NeteaseCloudImage(specType)
 
   override fun findInstanceByAgent(agent: AgentDescription): CloudInstance? {
     return null
@@ -32,7 +34,7 @@ class NeteaseCloudClient(private val specType: String?): CloudClientEx {
   }
 
   override fun getImages(): Collection<CloudImage> {
-    return if (image == null) emptyList() else listOf(image)
+    return listOf(image)
   }
 
   override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): CloudInstance {

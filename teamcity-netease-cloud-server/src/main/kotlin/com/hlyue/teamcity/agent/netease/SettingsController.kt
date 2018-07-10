@@ -1,6 +1,6 @@
 package com.hlyue.teamcity.agent.netease
 
-import jetbrains.buildServer.controllers.BaseController
+import jetbrains.buildServer.controllers.*
 import jetbrains.buildServer.serverSide.SBuildServer
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import jetbrains.buildServer.web.openapi.WebControllerManager
@@ -14,13 +14,15 @@ class SettingsController(private val server: SBuildServer,
                          private val pluginDescriptor: PluginDescriptor,
                          private val manager: WebControllerManager): BaseController(server) {
 
+  private companion object : Constants()
+
   private val myJspPath: String = pluginDescriptor.getPluginResourcesPath("settings.jsp")
   private val myHtmlPath: String = pluginDescriptor.getPluginResourcesPath("settings.html")
 
+  val myLogger = buildLogger()
+
   override fun doHandle(request: HttpServletRequest, response: HttpServletResponse): ModelAndView? {
-    request.setAttribute("org.apache.catalina.ASYNC_SUPPORTED", true)
     return if (isPost(request)) {
-      // TODO
       null
     } else {
       doGet(request, response)
