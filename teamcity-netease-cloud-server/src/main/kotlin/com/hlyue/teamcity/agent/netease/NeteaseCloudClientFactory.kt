@@ -1,5 +1,6 @@
 package com.hlyue.teamcity.agent.netease
 
+import com.hlyue.teamcity.agent.netease.Constants.Companion.buildLogger
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.controllers.BasePropertiesBean
 import jetbrains.buildServer.serverSide.*

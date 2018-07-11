@@ -7,6 +7,7 @@
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="constants" class="com.hlyue.teamcity.agent.netease.Constants"/>
+<jsp:useBean id="basePath" class="java.lang.String" scope="request"/>
 
 <l:settingsGroup title="Security Credentials">
     <tr>
@@ -46,4 +47,33 @@
                    value="<c:out value="${propertiesBean.properties[constants.PREFERENCE_MACHINE_TYPE]}"/>" />
         </td>
     </tr>
+    <script type="application/javascript">
+        function post(data, callback) {
+            $j.ajax({
+                url: "<c:url value='${basePath}'/>",
+                data: JSON.stringify(data),
+                contentType: 'application/json; charset=utf-8',
+                type: 'POST',
+                success: callback,
+                dataType: 'json'
+            })
+        }
+
+        function ready() {
+            let keyDom = $j("input[name='prop:${constants.PREFERENCE_ACCESS_KEY}']")
+            let secretDom = $j("input[name='prop:${constants.PREFERENCE_ACCESS_SECRET}']")
+            let loadNamespaces = () => post({
+                accessKey: keyDom.val(),
+                accessSecret: secretDom.val(),
+                resource: 'namespace'
+            }, (data) => {
+                console.log(data)
+            })
+
+            keyDom.change(loadNamespaces)
+            secretDom.change(loadNamespaces)
+            loadNamespaces()
+        }
+        $j(document).ready(ready)
+    </script>
 </l:settingsGroup>

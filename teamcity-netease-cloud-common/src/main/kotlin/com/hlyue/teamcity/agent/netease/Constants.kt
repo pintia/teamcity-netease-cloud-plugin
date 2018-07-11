@@ -21,6 +21,9 @@ open class Constants {
 
   val MACHINE_TYPE_LIST = listOf("ncs.n1.small2", "ncs.n1.medium4", "ncs.n1.large8")
 
-  fun buildLogger() = Loggers.ACTIVITIES
+  companion object {
+    fun buildLogger() = Loggers.ACTIVITIES
+  }
+
 
 }
