@@ -8,4 +8,6 @@ class PostRequest {
 
   var resource: String = ""
 
+  var params: Map<String, String> = emptyMap()
+
 }

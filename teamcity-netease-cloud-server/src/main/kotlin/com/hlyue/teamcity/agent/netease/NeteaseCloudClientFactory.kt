@@ -42,9 +42,7 @@ class NeteaseCloudClientFactory(
       logger.info("param $it: ${params.getParameter(it)}")
     }
 
-    return NeteaseCloudClient(params.getParameter(PREFERENCE_MACHINE_TYPE)!!,
-      params.getParameter(PREFERENCE_ACCESS_KEY)!!,
-      params.getParameter(PREFERENCE_ACCESS_SECRET)!!)
+    return NeteaseCloudClient(params)
   }
 
   override fun getCloudCode(): String = CLOUD_CODE

@@ -19,6 +19,14 @@ open class Constants {
 
   val PREFERENCE_MACHINE_TYPE = "machineType"
 
+  val PREFERENCE_NAMESPACE = "namespace"
+
+  val PREFERENCE_VPC = "vpc"
+
+  val PREFERENCE_SUBNET = "subnet"
+
+  val PREFERENCE_SECURITY_GROUP = "securityGroup"
+
   val MACHINE_TYPE_LIST = listOf("ncs.n1.small2", "ncs.n1.medium4", "ncs.n1.large8")
 
   companion object {

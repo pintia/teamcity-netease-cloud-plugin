@@ -5,7 +5,7 @@ class Resources {
     val signaturePy = """#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-
+import json
 import sys
 import getopt
 import urllib
@@ -206,12 +206,17 @@ def gen_curl(verbose, method, url, headers, body):
 
 def call(args):
     p = subprocess.Popen(args)
+    print("subprocess")
     pout,perr = p.communicate('')
+    print("communicate")
+    print(pout)
+    print(perr)
     if pout is not None:
         out = pout.decode('UTF-8')
         print out
     if perr is not None:
         err = perr.decode('UTF-8')
+        print(err)
         print >> sys.stderr, err
     return p.returncode
 
@@ -342,7 +347,8 @@ def main():
         # request
         curl_cmd = gen_curl(curl_verbose, method, url, headers, body)
         printer.show_var('curl', curl_cmd)
-        return call(curl_cmd)
+        print json.dumps(curl_cmd)
+        return 0
     except Exception as err:
         print >> sys.stderr, err.message
         if verbose:
@@ -366,7 +372,8 @@ def HexHMAC(key, msg):
     return hmac.new(key, msg, hashlib.sha256).hexdigest()
 
 # start
-main()
+if __name__ == "__main__":
+    main()
 """
   }
 }

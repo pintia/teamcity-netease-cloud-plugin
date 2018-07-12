@@ -4,43 +4,43 @@ import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudImage
 import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.InstanceStatus
+import jetbrains.buildServer.clouds.InstanceStatus.RUNNING
 import jetbrains.buildServer.serverSide.AgentDescription
+import java.time.Instant
 import java.util.*
 
-class NeteaseCloudInstance: CloudInstance {
+class NeteaseCloudInstance(val workloadId: Long,
+                           private val neteaseCloudImage: NeteaseCloudImage): CloudInstance {
+
+  private val now = Instant.now()
+
   override fun getStatus(): InstanceStatus {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    return RUNNING
   }
 
   override fun getInstanceId(): String {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    return "workload:$workloadId"
   }
 
-  override fun getName(): String {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  override fun getName(): String = "name"
 
   override fun getStartedTime(): Date {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    return Date.from(now)
   }
 
-  override fun getImage(): CloudImage {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  override fun getImage(): CloudImage = neteaseCloudImage
 
   override fun getNetworkIdentity(): String? {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    return null
   }
 
-  override fun getImageId(): String {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  override fun getImageId(): String = neteaseCloudImage.id
 
   override fun getErrorInfo(): CloudErrorInfo? {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    return null
   }
 
   override fun containsAgent(agent: AgentDescription): Boolean {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    return true
   }
 }
