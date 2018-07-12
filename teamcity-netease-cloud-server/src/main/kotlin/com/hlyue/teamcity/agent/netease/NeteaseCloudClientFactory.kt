@@ -42,7 +42,7 @@ class NeteaseCloudClientFactory(
       logger.info("param $it: ${params.getParameter(it)}")
     }
 
-    return NeteaseCloudClient(params)
+    return NeteaseCloudClient(params, serverSettings)
   }
 
   override fun getCloudCode(): String = CLOUD_CODE

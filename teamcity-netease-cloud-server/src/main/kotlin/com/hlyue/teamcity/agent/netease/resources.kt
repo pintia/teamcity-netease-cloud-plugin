@@ -227,7 +227,7 @@ def main():
         return 1
 
     verbose = False
-    curl_verbose = False
+    curl_verbose = True
     headers = {}
     method = 'GET'
     body = None

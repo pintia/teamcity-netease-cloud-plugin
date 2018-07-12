@@ -43,16 +43,17 @@ class NeteaseOpenApiConnector(private val accessKey: String,
         "--access-key=$accessKey",
         "--access-secret=$accessSecret",
         "-X", method,
-        "-H", "'Content-Type: $contentType'"
+        "-H", "content-type: $contentType"
       )
       if (!data.isBlank()) {
+        args.add("--data")
         args.add(data)
       }
       val additionQuery = query.entries.joinToString("&") { "${it.key}=${it.value}" }.let {
         if (it.isEmpty()) it else "&$it"
       }
       args.add("https://$host/$serviceName?Action=$action&Version=$version$additionQuery")
-      return args.joinToString(",") { "\"$it\""}
+      return args.joinToString(",") { "'$it'"}
     }
 
     fun request(): Deferred<String> = async(context) {
@@ -75,13 +76,20 @@ class NeteaseOpenApiConnector(private val accessKey: String,
       val content = out.toByteArray()!!.toString(Charsets.UTF_8)
       logger.info("response: $content")
       logger.info("error: ${err.toByteArray()!!.toString(Charsets.UTF_8)}")
+      println("response: $content")
       val type = object : TypeToken<List<String>>() { }.type
       val reader = JsonReader(StringReader(content))
       reader.isLenient = true
       val list = gson.fromJson<List<String>>(reader, type)
-      val (stdout, stderr) = runCommand(list.toTypedArray())
+      val (stdout, stderr) = runCommand(list.map {
+        it.trim()
+//          .replace("open.c.163.com/ncs", "requestbin.fullcontact.com/13nyzp11")
+//          .replace("open.c.163.com", "requestbin.fullcontact.com")
+      }.toTypedArray())
       logger.info("curl out: $stdout")
       logger.info("curl err: $stderr")
+      println(stdout)
+      println(stderr)
       interpreter.cleanup()
       interpreter.close()
       stdout
@@ -89,6 +97,7 @@ class NeteaseOpenApiConnector(private val accessKey: String,
 
     private fun runCommand(args: Array<String>): Pair<String, String> {
       logger.info("run command: ${args.joinToString(" ")}")
+      println("run command: ${args.joinToString(" ")}")
       val (output, error) = arrayOf(createTempFile(), createTempFile())
       output.deleteOnExit()
       error.deleteOnExit()

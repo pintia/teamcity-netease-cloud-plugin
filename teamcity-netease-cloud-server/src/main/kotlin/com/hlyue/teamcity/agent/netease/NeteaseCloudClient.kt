@@ -4,10 +4,14 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.serverSide.AgentDescription
+import jetbrains.buildServer.serverSide.ServerSettings
 import kotlinx.coroutines.experimental.runBlocking
+import org.apache.commons.lang3.RandomStringUtils
+import java.math.BigInteger
 import java.util.*
 
-class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameters): CloudClientEx {
+class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameters,
+                         private val serverSettings: ServerSettings): CloudClientEx {
 
   companion object : Constants()
 
@@ -19,13 +23,15 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
     cloudClientParameters.getParameter(PREFERENCE_ACCESS_SECRET)!!)
   private val logger = Constants.buildLogger()
 
+  private var lastError: CloudErrorInfo? = null
+
   override fun findInstanceByAgent(agent: AgentDescription): CloudInstance? {
-    logger.info("findInstanceByAgent: ${gson.toJson(agent)}")
+    logger.info("findInstanceByAgent: agent")
     return instances.firstOrNull()
   }
 
   override fun getErrorInfo(): CloudErrorInfo? {
-    return null
+    return lastError
   }
 
   override fun findImageById(imageId: String): CloudImage? {
@@ -34,6 +40,7 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
   }
 
   override fun canStartNewInstance(image: CloudImage): Boolean {
+    logger.info("canStartNewInstance: $image.id, ${instances.isEmpty()}")
     return instances.isEmpty()
   }
 
@@ -50,10 +57,11 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
   }
 
   override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): NeteaseCloudInstance = runBlocking {
-    logger.info("startNewInstance, image: ${gson.toJson(image)}, tag: ${gson.toJson(tag)}")
+    logger.info("startNewInstance, image: ${image.id}, tag: $tag")
 
     try {
       val myImage = image as NeteaseCloudImage
+      val name = "tc-${RandomStringUtils.randomAlphabetic(8).toLowerCase()}"
 
       val request = StatefulWorkloadCreateRequest(
         specType = cloudClientParameters.getParameter(PREFERENCE_MACHINE_TYPE)!!,
@@ -61,25 +69,29 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
         SubnetId = cloudClientParameters.getParameter(PREFERENCE_SUBNET)!!,
         SecurityGroupId = cloudClientParameters.getParameter(PREFERENCE_SECURITY_GROUP)!!,
         namespaceId = cloudClientParameters.getParameter(PREFERENCE_NAMESPACE)?.toLong() ?: 0L,
-        name = UUID.randomUUID().toString()
+        name = name,
+        serverUrl = serverSettings.rootUrl
       )
       val response = connector.NeteaseOpenApiRequestBuilder(
         action = "CreateStatefulWorkload",
+        method = "POST",
         url = "ncs",
         serviceName = "ncs",
         version = "2017-11-16",
         data = gson.toJson(request)
       ).request()
-      val type = object : TypeToken<Map<String, Long>>() { }.type
-      val json = gson.fromJson<Map<String, Long>>(response.await(), type)
+      logger.info("startNewInstance response: $response")
+      val json = gson.fromJson(response.await(), StatefulWorkloadCreateResponse::class.java)
 
-      val instance = NeteaseCloudInstance(json["StatefulWorkloadId"]!!, myImage)
+      val instance = NeteaseCloudInstance(json.StatefulWorkloadId, name, myImage)
       instances.add(instance)
       myImage.instances.add(instance)
+      lastError = null
       instance
     } catch (e: Exception) {
       logger.infoAndDebugDetails("startNewInstance", e)
-      null!!
+      lastError = CloudErrorInfo("cannot start new instant", e.localizedMessage, e)
+      instances.first()
     }
   }
 
@@ -90,5 +102,6 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
   }
 
   override fun dispose() {
+    logger.info("dispose:")
   }
 }

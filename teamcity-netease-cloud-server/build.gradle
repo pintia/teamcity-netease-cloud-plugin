@@ -19,7 +19,8 @@ serverPlugin.version = null
 dependencies {
     compile project(':teamcity-netease-cloud-common')
     server project(':teamcity-netease-cloud-common')
-    implementation 'com.google.code.gson:gson:2.8.5'
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'org.apache.commons:commons-lang3:3.7'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion"
 

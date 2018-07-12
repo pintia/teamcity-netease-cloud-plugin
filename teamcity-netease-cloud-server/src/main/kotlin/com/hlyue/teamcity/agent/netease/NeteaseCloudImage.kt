@@ -1,12 +1,13 @@
 package com.hlyue.teamcity.agent.netease
 
-import com.google.gson.Gson
 import jetbrains.buildServer.clouds.*
+import java.util.*
 
 class NeteaseCloudImage(private val specType: String): CloudImage {
 
+  private val id = UUID.randomUUID().toString()
+
   private val logger = Constants.buildLogger()
-  private val gson = Gson()
 
   val instances = mutableListOf<NeteaseCloudInstance>()
 
@@ -14,10 +15,10 @@ class NeteaseCloudImage(private val specType: String): CloudImage {
 
   override fun getName(): String = specType
 
-  override fun getId(): String = specType
+  override fun getId(): String = id
 
   override fun getInstances(): Collection<out CloudInstance> {
-    logger.info("getInstances: ${gson.toJson(instances)}")
+    logger.info("getInstances: myInstances: ${instances.joinToString(",") { it.instanceId }}")
     return instances
   }
 
@@ -26,7 +27,7 @@ class NeteaseCloudImage(private val specType: String): CloudImage {
   }
 
   override fun findInstanceById(id: String): CloudInstance? {
-    logger.info("findInstanceById: $id, myInstances: ${gson.toJson(instances)}")
+    logger.info("findInstanceById: $id, myInstances: ${instances.joinToString(",") { it.instanceId }}")
     return instances.firstOrNull { it.instanceId == id }
   }
 }
