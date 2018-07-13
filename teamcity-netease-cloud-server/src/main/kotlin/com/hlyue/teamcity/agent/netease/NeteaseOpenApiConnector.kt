@@ -27,14 +27,11 @@ class NeteaseOpenApiConnector(private val accessKey: String,
   inner class NeteaseOpenApiRequestBuilder(
     val action: String,
     val version: String,
-    val url: String,
     val serviceName: String = "ncs",
     val method: String = "GET",
     val data: String = "",
     val query: Map<String, String> = emptyMap()
   ) {
-
-    val date: String = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
 
     private fun buildArgs(): String {
       val args = mutableListOf("./resources.py",
@@ -83,13 +80,9 @@ class NeteaseOpenApiConnector(private val accessKey: String,
       val list = gson.fromJson<List<String>>(reader, type)
       val (stdout, stderr) = runCommand(list.map {
         it.trim()
-//          .replace("open.c.163.com/ncs", "requestbin.fullcontact.com/13nyzp11")
-//          .replace("open.c.163.com", "requestbin.fullcontact.com")
       }.toTypedArray())
       logger.info("curl out: $stdout")
       logger.info("curl err: $stderr")
-      println(stdout)
-      println(stderr)
       interpreter.cleanup()
       interpreter.close()
       stdout
@@ -97,7 +90,6 @@ class NeteaseOpenApiConnector(private val accessKey: String,
 
     private fun runCommand(args: Array<String>): Pair<String, String> {
       logger.info("run command: ${args.joinToString(" ")}")
-      println("run command: ${args.joinToString(" ")}")
       val (output, error) = arrayOf(createTempFile(), createTempFile())
       output.deleteOnExit()
       error.deleteOnExit()

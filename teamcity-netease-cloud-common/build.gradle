@@ -8,5 +8,4 @@ teamcity {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile 'com.squareup.okhttp3:okhttp:3.10.0'
-    compile group: 'org.python', name: 'jython-standalone', version: '2.7.1'
 }

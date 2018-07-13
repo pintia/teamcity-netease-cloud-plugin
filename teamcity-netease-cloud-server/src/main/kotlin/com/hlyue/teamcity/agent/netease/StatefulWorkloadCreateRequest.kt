@@ -7,7 +7,8 @@ class StatefulWorkloadCreateRequest(
   SecurityGroupId: String,
   namespaceId: Long,
   name: String,
-  serverUrl: String
+  serverUrl: String,
+  additionEnvS: List<EnvType> = emptyList()
 ) {
 
   val Placement = PlacementType()
@@ -22,17 +23,16 @@ class StatefulWorkloadCreateRequest(
     "agent" to "tc"
   )
 
-  val ContainerType = "Standard"
+  val ContainerType = "HighPerformance"
 
   val NamespaceId = namespaceId
 
   val Name = name
 
-  val Containers = arrayOf(ContainersType(name, specType, serverUrl))
+  val Containers = arrayOf(ContainersType(name, specType, serverUrl, additionEnvS))
 
-  val SecurityContext = SecurityContextType()
 
-  class ContainersType(name: String, specType: String, serverUrl: String) {
+  class ContainersType(name: String, specType: String, serverUrl: String, additionEnvS: List<EnvType>) {
     val Name = name
 
     val Image = "hub.c.163.com/patest/teamcity-agent:2018.1"
@@ -43,7 +43,10 @@ class StatefulWorkloadCreateRequest(
 
     val ResourceRequirements = ResourceRequirementsType(specType)
 
-    val Envs = arrayOf(EnvType("SERVER_URL",serverUrl))
+    val Envs = arrayOf(EnvType("SERVER_URL", serverUrl)) + additionEnvS
+
+    val SecurityContext = SecurityContextType()
+
   }
 
   class PlacementType {

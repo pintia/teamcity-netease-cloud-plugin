@@ -1,0 +1,29 @@
+plugins {
+    id 'com.github.rodm.teamcity-agent' version "1.0"
+}
+
+teamcity {
+    version = teamcityVersion
+    agent{
+        descriptor{
+            pluginDeployment{
+                useSeparateClassloader = true
+            }
+        }
+    }
+}
+
+dependencies {
+    compile project(':teamcity-netease-cloud-common')
+    compile 'com.google.code.gson:gson:2.5'
+    provided "org.jetbrains.teamcity:cloud-interface:$teamcityVersion"
+    provided "org.jetbrains.teamcity:cloud-shared:$teamcityVersion"
+    provided "org.jetbrains.teamcity.internal:agent:$teamcityVersion"
+}
+
+agentPlugin.version = null
+
+compileKotlin {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}

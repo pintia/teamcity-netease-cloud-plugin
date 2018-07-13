@@ -2,3 +2,4 @@ rootProject.name = "teamcity-netease-cloud"
 
 include("teamcity-netease-cloud-common")
 include("teamcity-netease-cloud-server")
+include("teamcity-netease-cloud-agent")

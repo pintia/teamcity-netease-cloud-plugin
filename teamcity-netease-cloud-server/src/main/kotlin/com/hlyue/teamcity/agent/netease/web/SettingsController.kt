@@ -72,7 +72,6 @@ class SettingsController(private val server: SBuildServer,
   fun getNamespace(connector: NeteaseOpenApiConnector): Deferred<String> {
     return connector.NeteaseOpenApiRequestBuilder(
       action = "DescribeNamespaces",
-      url = "ncs",
       serviceName = "ncs",
       version = "2017-11-16"
     ).request()
@@ -81,7 +80,6 @@ class SettingsController(private val server: SBuildServer,
   fun getVpc(connector: NeteaseOpenApiConnector): Deferred<String> {
     return connector.NeteaseOpenApiRequestBuilder(
       action = "ListVpc",
-      url = "vpc",
       serviceName = "vpc",
       version = "2017-11-30"
     ).request()
@@ -92,7 +90,6 @@ class SettingsController(private val server: SBuildServer,
       action = "ListSubnet",
       version = "2017-11-30",
       serviceName = "vpc",
-      url = "vpc",
       query = mapOf(
         "VpcId" to vpcId
       )
@@ -104,7 +101,6 @@ class SettingsController(private val server: SBuildServer,
       action = "ListSecurityGroup",
       version = "2017-11-30",
       serviceName = "vpc",
-      url = "vpc",
       query = mapOf(
         "VpcId" to vpcId
       )

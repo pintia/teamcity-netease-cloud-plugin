@@ -29,8 +29,14 @@ open class Constants {
 
   val MACHINE_TYPE_LIST = listOf("ncs.n1.small2", "ncs.n1.medium4", "ncs.n1.large8")
 
+  val ENV_INSTANCE_ID = "INSTANCE_ID"
+
+  val ENV_NETEASE_TC_AGENT = "NETEASE_TC_AGENT"
+
+  val ENV_SERVER_URL = "SERVER_URL"
+
   companion object {
-    fun buildLogger() = Loggers.ACTIVITIES
+    fun buildLogger() = Loggers.ACTIVITIES!!
   }
 
 
