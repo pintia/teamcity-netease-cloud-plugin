@@ -39,7 +39,7 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
 
   override fun canStartNewInstance(image: CloudImage): Boolean {
     logger.info("canStartNewInstance: $image.id, ${instances.isEmpty()}")
-    return instances.size <= 5
+    return instances.isEmpty()
   }
 
   override fun isInitialized(): Boolean {
@@ -79,7 +79,7 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
           "tc-agent" to "netease",
           "agent-id" to instance.envWorkloadId
         ),
-        "ContainerType" to "HighPerformance",
+        "ContainerType" to "Standard",
         "NamespaceId" to config.namespaceId,
         "Name" to name,
         "Containers" to jsonArray(jsonObject(

@@ -1,7 +1,9 @@
 package com.hlyue.teamcity.agent.netease
 
-import com.google.gson.JsonObject
-import jetbrains.buildServer.clouds.*
+import jetbrains.buildServer.clouds.CloudErrorInfo
+import jetbrains.buildServer.clouds.CloudImage
+import jetbrains.buildServer.clouds.CloudInstance
+import jetbrains.buildServer.clouds.InstanceStatus
 import jetbrains.buildServer.clouds.InstanceStatus.*
 import jetbrains.buildServer.serverSide.AgentDescription
 import kotlinx.coroutines.experimental.*
@@ -9,11 +11,14 @@ import org.apache.commons.lang3.RandomStringUtils
 import org.json.JSONObject
 import java.time.Instant
 import java.util.*
+import java.util.concurrent.TimeUnit
 
-class NeteaseCloudInstance(val workloadName: String,
-                           private val neteaseCloudImage: NeteaseCloudImage,
-                           private val connector: NeteaseOpenApiConnector,
-                           private val config: NeteaseConfig) : CloudInstance {
+class NeteaseCloudInstance(
+  val workloadName: String,
+  private val neteaseCloudImage: NeteaseCloudImage,
+  private val connector: NeteaseOpenApiConnector,
+  private val config: NeteaseConfig
+) : CloudInstance {
 
   companion object : Constants()
 
@@ -24,11 +29,25 @@ class NeteaseCloudInstance(val workloadName: String,
   private var lastError: CloudErrorInfo? = null
   private val now = Instant.now()
   private val context = newSingleThreadContext("instance:$envWorkloadId")
+  @Volatile
+  private var mStatus: InstanceStatus = SCHEDULED_TO_START
 
-  fun getInfo(): Deferred<JSONObject?> = async(context) {
+  init {
+    launch(context) {
+      while (true) {
+        try {
+          delay(10, TimeUnit.SECONDS)
+          mStatus = fetchStatus()
+        } catch (e: Exception) {
+        }
+      }
+    }
+  }
+
+  private suspend fun getInfo(): JSONObject? {
     lastError = null
     var response = "{}"
-    try {
+    return try {
       response = connector.NeteaseOpenApiRequestBuilder(
         action = "DescribeStatefulWorkloadInfo",
         version = "2017-11-16",
@@ -45,25 +64,27 @@ class NeteaseCloudInstance(val workloadName: String,
     }
   }
 
-  override fun getStatus(): InstanceStatus = runBlocking(context) {
+  private suspend fun fetchStatus(): InstanceStatus {
     lastError = null
     var response: JSONObject? = null
-    try {
-      response = getInfo().await()
-      when (response!!.getString("StatefulWorkloadStatus")) {
+    return try {
+      response = getInfo()
+      when (response!!.getString("Status")) {
       //https://www.163yun.com/help/documents/157254714362351616
         "Creating" -> STARTING
         "CreateFail" -> ERROR
         "Updating" -> STARTING
         "Running" -> RUNNING
         "Abnormal" -> ERROR
-        else -> STOPPED
+        else -> UNKNOWN
       }
     } catch (e: Exception) {
       lastError = CloudErrorInfo("getStatus", "failed, response: ${response?.toString()}", e)
-      ERROR
+      UNKNOWN
     }
   }
+
+  override fun getStatus(): InstanceStatus = mStatus
 
   override fun getInstanceId(): String {
     return "workload:$workloadId"
@@ -101,7 +122,7 @@ class NeteaseCloudInstance(val workloadName: String,
         "NamespaceId" to config.namespaceId.toString(),
         "StatefulWorkloadId" to workloadId.toString()
       )
-    )
+    ).request().await()
   }
 
   fun forceRestart() = runBlocking(context) {
