@@ -39,7 +39,7 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
 
   override fun canStartNewInstance(image: CloudImage): Boolean {
     logger.info("canStartNewInstance: $image.id, ${instances.isEmpty()}")
-    return instances.isEmpty()
+    return instances.size <= 5
   }
 
   override fun isInitialized(): Boolean {
@@ -102,6 +102,10 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
             jsonObject(
               "Name" to ENV_NETEASE_TC_AGENT,
               "Value" to "true"
+            ),
+            jsonObject(
+              "Name" to "DOCKER_IN_DOCKER",
+              "Value" to "start"
             )
           ),
           "SecurityContext" to jsonObject(
@@ -138,7 +142,8 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
     (instance as NeteaseCloudInstance).forceRestart()
   }
 
-  override fun dispose() {
+  override fun dispose() = runBlocking {
     logger.info("dispose:")
+    instances.forEach { it.terminate() }
   }
 }
