@@ -1,15 +1,12 @@
 package com.hlyue.teamcity.agent.netease
 
+import com.github.salomonbrys.kotson.*
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.hlyue.teamcity.agent.netease.StatefulWorkloadCreateRequest.EnvType
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.serverSide.AgentDescription
 import jetbrains.buildServer.serverSide.ServerSettings
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.experimental.*
 import org.apache.commons.lang3.RandomStringUtils
-import java.math.BigInteger
-import java.util.*
 
 class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameters,
                          private val serverSettings: ServerSettings): CloudClientEx {
@@ -58,7 +55,9 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
   }
 
   override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): NeteaseCloudInstance = runBlocking {
+    lastError = null
     logger.info("startNewInstance, image: ${image.id}, tag: $tag")
+    var response: String? = null
 
     try {
       val config = NeteaseConfig.buildFromCloudConfig(cloudClientParameters)
@@ -66,45 +65,77 @@ class NeteaseCloudClient(private val cloudClientParameters: CloudClientParameter
       val name = "tc-${RandomStringUtils.randomAlphabetic(8).toLowerCase()}"
       val instance = NeteaseCloudInstance(name, myImage, connector, config)
 
-      val request = StatefulWorkloadCreateRequest(
-        specType = config.machineType,
-        VpcId = config.vpcId,
-        SubnetId = config.subnetId,
-        SecurityGroupId = config.securityGroupId,
-        namespaceId = config.namespaceId,
-        name = name,
-        serverUrl = serverSettings.rootUrl,
-        additionEnvS = listOf(
-          EnvType(ENV_NETEASE_TC_AGENT, "true"),
-          EnvType(ENV_INSTANCE_ID, instance.envWorkloadId)
-        )
+      val request = jsonObject(
+        "Placement" to jsonObject(
+          "ZoneId" to jsonArray("cn-east-1b")
+        ),
+        "SpecType" to config.machineType,
+        "VirtualPrivateCloud" to jsonObject(
+          "VpcId" to config.vpcId,
+          "SubnetId" to config.subnetId
+        ),
+        "SecurityGroupIds" to jsonArray(config.securityGroupId),
+        "Labels" to jsonObject(
+          "tc-agent" to "netease",
+          "agent-id" to instance.envWorkloadId
+        ),
+        "ContainerType" to "HighPerformance",
+        "NamespaceId" to config.namespaceId,
+        "Name" to name,
+        "Containers" to jsonArray(jsonObject(
+          "Name" to name,
+          "Image" to "hub.c.163.com/patest/teamcity-agent:2018.1",
+          "LogDirs" to jsonArray("/opt/buildagent/temp/", "/opt/buildagent/logs/"),
+          "ResourceRequirements" to jsonObject(
+            "Limits" to StatefulWorkloadCreateRequest.REQUIREMENTS[config.machineType],
+            "Requests" to StatefulWorkloadCreateRequest.REQUIREMENTS[config.machineType]
+          ),
+          "Envs" to jsonArray(
+            jsonObject(
+              "Name" to ENV_SERVER_URL,
+              "Value" to serverSettings.rootUrl
+            ),
+            jsonObject(
+              "Name" to ENV_INSTANCE_ID,
+              "Value" to instance.envWorkloadId
+            ),
+            jsonObject(
+              "Name" to ENV_NETEASE_TC_AGENT,
+              "Value" to "true"
+            )
+          ),
+          "SecurityContext" to jsonObject(
+            "Privilege" to true
+          )
+        ))
       )
-      val response = connector.NeteaseOpenApiRequestBuilder(
-        action = "CreateStatefulWorkload",
-        method = "POST",
-        serviceName = "ncs",
-        version = "2017-11-16",
-        data = gson.toJson(request)
-      ).request()
+      response = connector.NeteaseOpenApiRequestBuilder(
+          action = "CreateStatefulWorkload",
+          method = "POST",
+          serviceName = "ncs",
+          version = "2017-11-16",
+          data = request.toString()
+      ).request().await()
       logger.info("startNewInstance response: $response")
-      val json = gson.fromJson(response.await(), StatefulWorkloadCreateResponse::class.java)
+      val json = gson.fromJson(response, StatefulWorkloadCreateResponse::class.java)
       instance.workloadId = json.StatefulWorkloadId
 
       instances.add(instance)
       myImage.instances.add(instance)
-      lastError = null
       instance
     } catch (e: Exception) {
       logger.infoAndDebugDetails("startNewInstance", e)
-      lastError = CloudErrorInfo("cannot start new instant", e.localizedMessage, e)
+      lastError = CloudErrorInfo("cannot start new instant", response ?: "null response", e)
       instances.first()
     }
   }
 
   override fun terminateInstance(instance: CloudInstance) {
+    (instance as NeteaseCloudInstance).terminate()
   }
 
   override fun restartInstance(instance: CloudInstance) {
+    (instance as NeteaseCloudInstance).forceRestart()
   }
 
   override fun dispose() {
