@@ -21,9 +21,11 @@ class EnvProvider(agentEvents: EventDispatcher<AgentLifeCycleListener>,
     val tcAgentId = environment[ENV_NETEASE_TC_AGENT] ?: ""
     val instanceId = environment[ENV_INSTANCE_ID] ?: ""
     val providedServerUrl = environment[ENV_SERVER_URL] ?: ""
+    val name = environment[ENV_INSTANCE_NAME] ?: ""
     agentConfigurationEx.serverUrl = providedServerUrl
     agentConfigurationEx.addConfigurationParameter(ENV_NETEASE_TC_AGENT, tcAgentId)
     agentConfigurationEx.addConfigurationParameter(ENV_INSTANCE_ID, instanceId)
-    agentConfigurationEx.name = instanceId
+    agentConfigurationEx.addConfigurationParameter(ENV_INSTANCE_NAME, name)
+    agentConfigurationEx.name = name
   }
 }

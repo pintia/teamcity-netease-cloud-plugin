@@ -15,6 +15,8 @@ open class Constants {
 
   val PREFERENCE_ACCESS_KEY = "accessKey"
 
+  val PREFERENCE_SERVER_URL = "neteaseServerUrl"
+
   val PREFERENCE_ACCESS_SECRET = "accessSecret"
 
   val PREFERENCE_MACHINE_TYPE = "machineType"
@@ -32,6 +34,8 @@ open class Constants {
   val ENV_INSTANCE_ID = "INSTANCE_ID"
 
   val ENV_NETEASE_TC_AGENT = "NETEASE_TC_AGENT"
+
+  val ENV_INSTANCE_NAME = "INSTANCE_NAME"
 
   val ENV_SERVER_URL = "SERVER_URL"
 

@@ -30,6 +30,16 @@
         </td>
     </tr>
     <tr>
+        <th><label for="${constants.PREFERENCE_SERVER_URL}">Server Url: <l:star/></label></th>
+        <td>
+            <div>
+                <input name="prop:${constants.PREFERENCE_SERVER_URL}" class="longField"
+                       data-bind="initializeValue: ${propertiesBean.properties[constants.PREFERENCE_SERVER_URL]}"
+                       value="<c:out value="${propertiesBean.properties[constants.PREFERENCE_SERVER_URL]}"/>" />
+            </div>
+        </td>
+    </tr>
+    <tr>
         <th><label for="${constants.PREFERENCE_MACHINE_TYPE}_SELECT">Machine Type: <l:star/></label></th>
         <td>
             <select name="${constants.PREFERENCE_MACHINE_TYPE}_SELECT" class="longField"

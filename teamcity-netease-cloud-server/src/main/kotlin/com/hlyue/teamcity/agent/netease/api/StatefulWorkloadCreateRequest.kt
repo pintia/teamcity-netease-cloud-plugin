@@ -1,4 +1,4 @@
-package com.hlyue.teamcity.agent.netease
+package com.hlyue.teamcity.agent.netease.api
 
 import com.github.salomonbrys.kotson.jsonObject
 

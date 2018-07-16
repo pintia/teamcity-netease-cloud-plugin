@@ -8,6 +8,8 @@ class NeteaseConfig private constructor(
 
   val accessSecret: String,
 
+  val serverUrl: String,
+
   val machineType: String,
 
   val vpcId: String,
@@ -28,6 +30,7 @@ class NeteaseConfig private constructor(
       return NeteaseConfig(
         accessKey = cloudClientParameters.getParameter(constants.PREFERENCE_ACCESS_KEY)!!,
         accessSecret = cloudClientParameters.getParameter(constants.PREFERENCE_ACCESS_SECRET)!!,
+        serverUrl = cloudClientParameters.getParameter(constants.PREFERENCE_SERVER_URL)!!,
         machineType = cloudClientParameters.getParameter(constants.PREFERENCE_MACHINE_TYPE)!!,
         vpcId = cloudClientParameters.getParameter(constants.PREFERENCE_VPC)!!,
         subnetId = cloudClientParameters.getParameter(constants.PREFERENCE_SUBNET)!!,

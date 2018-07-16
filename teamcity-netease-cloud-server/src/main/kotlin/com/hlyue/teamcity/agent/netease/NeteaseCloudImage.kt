@@ -1,11 +1,12 @@
 package com.hlyue.teamcity.agent.netease
 
 import jetbrains.buildServer.clouds.*
-import java.util.*
+import org.apache.commons.lang3.RandomStringUtils
 
-class NeteaseCloudImage(private val specType: String): CloudImage {
+class NeteaseCloudImage(private val specType: String,
+                        private val cloudClient: NeteaseCloudClient): CloudImage {
 
-  private val id = UUID.randomUUID().toString()
+  private val id = RandomStringUtils.randomAlphabetic(6).toLowerCase()
 
   private val logger = Constants.buildLogger()
 
@@ -17,9 +18,8 @@ class NeteaseCloudImage(private val specType: String): CloudImage {
 
   override fun getId(): String = id
 
-  override fun getInstances(): Collection<out CloudInstance> {
-    logger.info("getInstances: myInstances: ${instances.joinToString(",") { it.instanceId }}")
-    return instances
+  override fun getInstances(): Collection<CloudInstance> {
+    return cloudClient.instances
   }
 
   override fun getErrorInfo(): CloudErrorInfo? {
@@ -27,7 +27,6 @@ class NeteaseCloudImage(private val specType: String): CloudImage {
   }
 
   override fun findInstanceById(id: String): CloudInstance? {
-    logger.info("findInstanceById: $id, myInstances: ${instances.joinToString(",") { it.instanceId }}")
     return instances.firstOrNull { it.instanceId == id }
   }
 }

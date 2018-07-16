@@ -2,7 +2,6 @@ package com.hlyue.teamcity.agent.netease
 
 import com.hlyue.teamcity.agent.netease.Constants.Companion.buildLogger
 import jetbrains.buildServer.clouds.*
-import jetbrains.buildServer.controllers.BasePropertiesBean
 import jetbrains.buildServer.serverSide.*
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import org.springframework.stereotype.Component
@@ -28,7 +27,7 @@ class NeteaseCloudClientFactory(
   }
 
   override fun canBeAgentOfType(description: AgentDescription): Boolean {
-    return true
+    return description.configurationParameters.containsKey(ENV_NETEASE_TC_AGENT)
   }
 
   override fun getDisplayName(): String = DISPLAY_NAME
@@ -42,7 +41,7 @@ class NeteaseCloudClientFactory(
       logger.info("param $it: ${params.getParameter(it)}")
     }
 
-    return NeteaseCloudClient(params, serverSettings)
+    return NeteaseCloudClient(state.profileId, params)
   }
 
   override fun getCloudCode(): String = CLOUD_CODE

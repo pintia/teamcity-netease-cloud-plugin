@@ -9,7 +9,6 @@ import jetbrains.buildServer.serverSide.SBuildServer
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import jetbrains.buildServer.web.openapi.WebControllerManager
 import kotlinx.coroutines.experimental.*
-import org.python.indexer.Def
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.ModelAndView
 import javax.servlet.AsyncContext

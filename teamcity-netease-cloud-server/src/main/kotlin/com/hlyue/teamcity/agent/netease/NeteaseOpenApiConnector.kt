@@ -29,7 +29,7 @@ class NeteaseOpenApiConnector(private val accessKey: String,
     val version: String,
     val serviceName: String = "ncs",
     val method: String = "GET",
-    val data: String = "",
+    val data: String = "{}",
     val query: Map<String, String> = emptyMap()
   ) {
 
@@ -42,7 +42,7 @@ class NeteaseOpenApiConnector(private val accessKey: String,
         "-X", method,
         "-H", "content-type: $contentType"
       )
-      if (!data.isBlank()) {
+      if (method == "POST") {
         args.add("--data")
         args.add(data)
       }
@@ -71,9 +71,6 @@ class NeteaseOpenApiConnector(private val accessKey: String,
         logger.error(e)
       }
       val content = out.toByteArray()!!.toString(Charsets.UTF_8)
-      logger.info("response: $content")
-      logger.info("error: ${err.toByteArray()!!.toString(Charsets.UTF_8)}")
-      println("response: $content")
       val type = object : TypeToken<List<String>>() { }.type
       val reader = JsonReader(StringReader(content))
       reader.isLenient = true
@@ -82,7 +79,6 @@ class NeteaseOpenApiConnector(private val accessKey: String,
         it.trim()
       }.toTypedArray())
       logger.info("curl out: $stdout")
-      logger.info("curl err: $stderr")
       interpreter.cleanup()
       interpreter.close()
       stdout

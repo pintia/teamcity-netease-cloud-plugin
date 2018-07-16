@@ -9,6 +9,7 @@ import jetbrains.buildServer.serverSide.AgentDescription
 import kotlinx.coroutines.experimental.*
 import org.apache.commons.lang3.RandomStringUtils
 import org.json.JSONObject
+import java.io.Closeable
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -17,8 +18,10 @@ class NeteaseCloudInstance(
   val workloadName: String,
   private val neteaseCloudImage: NeteaseCloudImage,
   private val connector: NeteaseOpenApiConnector,
-  private val config: NeteaseConfig
-) : CloudInstance {
+  private val config: NeteaseConfig,
+  val dataDiskId: Int,
+  val dockerDiskId: Int
+) : CloudInstance, Closeable {
 
   companion object : Constants()
 
@@ -30,57 +33,17 @@ class NeteaseCloudInstance(
   private val now = Instant.now()
   private val context = newSingleThreadContext("instance:$envWorkloadId")
   @Volatile
-  private var mStatus: InstanceStatus = SCHEDULED_TO_START
+  var mStatus: InstanceStatus = SCHEDULED_TO_START
 
-  init {
-    launch(context) {
-      while (true) {
-        try {
-          delay(10, TimeUnit.SECONDS)
-          mStatus = fetchStatus()
-        } catch (e: Exception) {
-        }
-      }
-    }
-  }
-
-  private suspend fun getInfo(): JSONObject? {
-    lastError = null
-    var response = "{}"
-    return try {
-      response = connector.NeteaseOpenApiRequestBuilder(
-        action = "DescribeStatefulWorkloadInfo",
-        version = "2017-11-16",
-        serviceName = "ncs",
-        query = mapOf(
-          "NamespaceId" to config.namespaceId.toString(),
-          "StatefulWorkloadId" to workloadId.toString()
-        )
-      ).request().await()
-      JSONObject(response)
-    } catch (e: Exception) {
-      lastError = CloudErrorInfo("GetInfo", "Json parse failed, res:$response", e)
-      null
-    }
-  }
-
-  private suspend fun fetchStatus(): InstanceStatus {
-    lastError = null
-    var response: JSONObject? = null
-    return try {
-      response = getInfo()
-      when (response!!.getString("Status")) {
-      //https://www.163yun.com/help/documents/157254714362351616
-        "Creating" -> STARTING
-        "CreateFail" -> ERROR
-        "Updating" -> STARTING
-        "Running" -> RUNNING
-        "Abnormal" -> ERROR
-        else -> UNKNOWN
-      }
-    } catch (e: Exception) {
-      lastError = CloudErrorInfo("getStatus", "failed, response: ${response?.toString()}", e)
-      UNKNOWN
+  fun setStatus(status: String) {
+    mStatus = when (status) {
+    //https://www.163yun.com/help/documents/157254714362351616
+      "Creating" -> STARTING
+      "CreateFail" -> ERROR
+      "Updating" -> STARTING
+      "Running" -> RUNNING
+      "Abnormal" -> ERROR
+      else -> UNKNOWN
     }
   }
 
@@ -135,5 +98,9 @@ class NeteaseCloudInstance(
         "StatefulWorkloadId" to workloadId.toString()
       )
     ).request().await()
+  }
+
+  override fun close() {
+    context.close()
   }
 }
