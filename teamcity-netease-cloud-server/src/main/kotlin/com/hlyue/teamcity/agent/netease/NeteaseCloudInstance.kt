@@ -19,7 +19,6 @@ class NeteaseCloudInstance(
   private val neteaseCloudImage: NeteaseCloudImage,
   private val connector: NeteaseOpenApiConnector,
   private val config: NeteaseConfig,
-  val dataDiskId: Int,
   val dockerDiskId: Int
 ) : CloudInstance, Closeable {
 

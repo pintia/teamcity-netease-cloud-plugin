@@ -7,6 +7,7 @@ import com.hlyue.teamcity.agent.netease.NeteaseCloudInstance.Companion
 import com.hlyue.teamcity.agent.netease.api.StatefulWorkloadCreateRequest
 import com.hlyue.teamcity.agent.netease.api.StatefulWorkloadCreateResponse
 import com.hlyue.teamcity.agent.netease.api.WorkloadLabels
+import com.hlyue.teamcity.agent.netease.other.NameGenerator
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.serverSide.AgentDescription
 import jetbrains.buildServer.serverSide.ServerSettings
@@ -38,7 +39,7 @@ class NeteaseCloudClient(
 
   init {
     backgroundJob = launch(context) {
-      var responseString: String = ""
+      var responseString = ""
       while (true) {
         try {
           delay(15, TimeUnit.SECONDS)
@@ -146,9 +147,9 @@ class NeteaseCloudClient(
     try {
       val config = NeteaseConfig.buildFromCloudConfig(cloudClientParameters)
       val myImage = image as NeteaseCloudImage
-      val name = "tc-${RandomStringUtils.randomAlphabetic(8).toLowerCase()}"
-      val disks = diskProvider.getDisks(name).await()
-      val instance = NeteaseCloudInstance(name, myImage, connector, config, disks.first, disks.second)
+      val name = "tc-" + NameGenerator.generate()
+      val dockerDiskId = diskProvider.getDockerDisk().await()
+      val instance = NeteaseCloudInstance(name, myImage, connector, config, dockerDiskId)
 
       val request = jsonObject(
         "Placement" to jsonObject(
@@ -165,14 +166,14 @@ class NeteaseCloudClient(
           "agent-id" to instance.envWorkloadId,
           "profile-id" to profileId
         ),
-        "ContainerType" to "Standard",
+        "ContainerType" to "HighPerformance",
         "NamespaceId" to config.namespaceId,
         "Name" to name,
         "Containers" to jsonArray(
           jsonObject(
             "Name" to name,
             "Image" to "hub.c.163.com/patest/teamcity-agent:2018.1",
-            "LogDirs" to jsonArray("/opt/buildagent/temp/", "/opt/buildagent/logs/"),
+            "LogDirs" to jsonArray("/opt/buildagent/logs/"),
             "ResourceRequirements" to jsonObject(
               "Limits" to StatefulWorkloadCreateRequest.REQUIREMENTS[config.machineType],
               "Requests" to StatefulWorkloadCreateRequest.REQUIREMENTS[config.machineType]
@@ -203,13 +204,9 @@ class NeteaseCloudClient(
               "Privilege" to true
             ),
             "DataDisks" to jsonArray(jsonObject(
-              "DiskType" to "CloudSsd",
-              "MountPath" to "/opt/",
-              "DiskId" to instance.dataDiskId
-            ), jsonObject(
-              "DiskType" to "CloudSsd",
+              "DiskType" to "CloudHighPerformanceSsd",
               "MountPath" to "/var/lib/docker/",
-              "DiskId" to instance.dockerDiskId
+              "DiskId" to dockerDiskId
             ))
           )
         )
@@ -237,8 +234,6 @@ class NeteaseCloudClient(
   override fun terminateInstance(instance: CloudInstance) {
     (instance as NeteaseCloudInstance).let {
       it.terminate()
-      diskProvider.removeDisk(it.dataDiskId)
-      diskProvider.removeDisk(it.dockerDiskId)
       it.close()
     }
   }

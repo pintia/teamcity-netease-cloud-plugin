@@ -5,6 +5,8 @@ import jetbrains.buildServer.log.Loggers
 
 open class Constants {
 
+  val NETEASE_ZONE_ID = "cn-east-1b"
+
   val CLOUD_CODE = "163"
 
   val DISPLAY_NAME = "Netease Cloud"
