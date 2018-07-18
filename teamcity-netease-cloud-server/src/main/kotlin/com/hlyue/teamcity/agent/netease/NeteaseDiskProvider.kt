@@ -1,7 +1,6 @@
 package com.hlyue.teamcity.agent.netease
 
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.hlyue.teamcity.agent.netease.api.DiskCxtResponse
 import kotlinx.coroutines.experimental.*
 import org.apache.commons.lang3.RandomStringUtils

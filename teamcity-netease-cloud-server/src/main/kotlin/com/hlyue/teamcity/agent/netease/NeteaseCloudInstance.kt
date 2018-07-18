@@ -27,6 +27,7 @@ class NeteaseCloudInstance(
   val envWorkloadId = RandomStringUtils.randomAlphabetic(8).toLowerCase()
 
   var workloadId: Long = 0L
+  var errorCount = 0
 
   private var lastError: CloudErrorInfo? = null
   private val now = Instant.now()
@@ -44,6 +45,8 @@ class NeteaseCloudInstance(
       "Abnormal" -> ERROR
       else -> UNKNOWN
     }
+    if (mStatus != RUNNING) ++errorCount
+    else errorCount = 0
   }
 
   override fun getStatus(): InstanceStatus = mStatus

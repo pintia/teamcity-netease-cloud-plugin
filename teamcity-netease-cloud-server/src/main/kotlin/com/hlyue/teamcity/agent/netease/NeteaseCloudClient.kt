@@ -22,6 +22,8 @@ class NeteaseCloudClient(
 ) : CloudClientEx {
 
   companion object : Constants()
+  // 15 seconds * 12 = 3 minutes. This usually means creation failed.
+  private val MAX_ERROR_COUNT = 12
 
   val instances = mutableListOf<NeteaseCloudInstance>()
 
@@ -65,6 +67,10 @@ class NeteaseCloudClient(
             val instance = instances.firstOrNull { it.workloadId == id }
             if (instance != null) {
               instance.setStatus(item.getString("Status"))
+              if (instance.errorCount >= 12) {
+                instances.remove(instance)
+                terminateInstance(instance)
+              }
             } else {
               // TODO: auto discover
 //              val info = getInstanceInfo(config, id)
