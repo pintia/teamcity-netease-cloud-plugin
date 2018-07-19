@@ -18,8 +18,7 @@ class NeteaseCloudInstance(
   val workloadName: String,
   private val neteaseCloudImage: NeteaseCloudImage,
   private val connector: NeteaseOpenApiConnector,
-  private val config: NeteaseConfig,
-  val dockerDiskId: Int
+  private val config: NeteaseConfig
 ) : CloudInstance, Closeable {
 
   companion object : Constants()
@@ -78,7 +77,7 @@ class NeteaseCloudInstance(
     return envWorkloadId == workloadId
   }
 
-  fun terminate() = runBlocking(context) {
+  suspend fun terminate() {
     connector.NeteaseOpenApiRequestBuilder(
       action = "DeleteStatefulWorkload",
       version = "2017-11-16",
@@ -90,7 +89,7 @@ class NeteaseCloudInstance(
     ).request().await()
   }
 
-  fun forceRestart() = runBlocking(context) {
+  suspend fun forceRestart() {
     connector.NeteaseOpenApiRequestBuilder(
       action = "RestartStatefulWorkloadInstance",
       version = "2017-11-16",

@@ -3,16 +3,12 @@ package com.hlyue.teamcity.agent.netease
 import com.github.salomonbrys.kotson.jsonArray
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.Gson
-import com.hlyue.teamcity.agent.netease.NeteaseCloudInstance.Companion
 import com.hlyue.teamcity.agent.netease.api.StatefulWorkloadCreateRequest
 import com.hlyue.teamcity.agent.netease.api.StatefulWorkloadCreateResponse
-import com.hlyue.teamcity.agent.netease.api.WorkloadLabels
 import com.hlyue.teamcity.agent.netease.other.NameGenerator
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.serverSide.AgentDescription
-import jetbrains.buildServer.serverSide.ServerSettings
 import kotlinx.coroutines.experimental.*
-import org.apache.commons.lang3.RandomStringUtils
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
@@ -23,7 +19,7 @@ class NeteaseCloudClient(
 
   companion object : Constants()
   // 15 seconds * 12 = 3 minutes. This usually means creation failed.
-  private val MAX_ERROR_COUNT = 12
+  private val MAX_ERROR_COUNT = 8
 
   val instances = mutableListOf<NeteaseCloudInstance>()
 
@@ -67,9 +63,8 @@ class NeteaseCloudClient(
             val instance = instances.firstOrNull { it.workloadId == id }
             if (instance != null) {
               instance.setStatus(item.getString("Status"))
-              if (instance.errorCount >= 12) {
-                instances.remove(instance)
-                terminateInstance(instance)
+              if (instance.errorCount >= MAX_ERROR_COUNT) {
+                terminateInstanceAsync(instance)
               }
             } else {
               // TODO: auto discover
@@ -87,11 +82,12 @@ class NeteaseCloudClient(
             }
           }
           instances.removeAll {
-            val shouldRemove = !workloadIds.contains(it.workloadId)
-            if (shouldRemove) {
-              terminateInstance(it)
+            if (!workloadIds.contains(it.workloadId)) {
+              terminateInstanceAsync(it)
+              true
+            } else {
+              false
             }
-            shouldRemove
           }
         } catch (e: Exception) {
           lastError = CloudErrorInfo("backgroudJob", responseString, e)
@@ -155,7 +151,7 @@ class NeteaseCloudClient(
       val myImage = image as NeteaseCloudImage
       val name = "tc-" + NameGenerator.generate()
       val dockerDiskId = diskProvider.getDockerDisk().await()
-      val instance = NeteaseCloudInstance(name, myImage, connector, config, dockerDiskId)
+      val instance = NeteaseCloudInstance(name, myImage, connector, config)
 
       val request = jsonObject(
         "Placement" to jsonObject(
@@ -237,14 +233,22 @@ class NeteaseCloudClient(
     }
   }
 
-  override fun terminateInstance(instance: CloudInstance) {
+  private fun terminateInstanceAsync(instance: CloudInstance) = async(context) {
+    launch {
+      delay(30, TimeUnit.SECONDS)
+      instances.remove(instance)
+    }
     (instance as NeteaseCloudInstance).let {
       it.terminate()
       it.close()
     }
   }
 
-  override fun restartInstance(instance: CloudInstance) {
+  override fun terminateInstance(instance: CloudInstance) = runBlocking(context) {
+    terminateInstanceAsync(instance).await()
+  }
+
+  override fun restartInstance(instance: CloudInstance) = runBlocking(context) {
     (instance as NeteaseCloudInstance).forceRestart()
   }
 
@@ -255,5 +259,6 @@ class NeteaseCloudClient(
       it.terminate()
       it.close()
     }
+    instances.clear()
   }
 }

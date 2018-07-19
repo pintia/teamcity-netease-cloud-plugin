@@ -13,8 +13,8 @@ class NeteaseDiskProvider(private val profileId: String,
 
   companion object {
     val DOCKER_DISK_PREFIX = "tc-agent-docker-"
+    val WORK_DISK_PREFIX = "tc-agent-work-"
     val DISK_TYPE = "CloudHighPerformanceSsd"
-    val DISK_SNAPSHOT = 5235
   }
   private val constants = Constants()
   private val context = newSingleThreadContext("disk-$profileId")
@@ -22,9 +22,9 @@ class NeteaseDiskProvider(private val profileId: String,
   private val logger = Constants.buildLogger()
   private val gson = Gson()
 
-  private fun createDisk() = async(context) {
+  private fun createDisk(prefix: String) = async(context) {
     try {
-      val name = "$DOCKER_DISK_PREFIX${RandomStringUtils.randomAlphabetic(4).toLowerCase()}"
+      val name = "$prefix${RandomStringUtils.randomAlphabetic(4).toLowerCase()}"
       val response = connector.NeteaseOpenApiRequestBuilder(
         serviceName = "ncv",
         action = "CreateDisk",
@@ -62,7 +62,7 @@ class NeteaseDiskProvider(private val profileId: String,
     }
   }
 
-  private fun getAvailableDisk() = async(context) {
+  private fun getAvailableDisk(prefix: String) = async(context) {
     try {
       val response = connector.NeteaseOpenApiRequestBuilder(
         serviceName = "ncv",
@@ -75,7 +75,7 @@ class NeteaseDiskProvider(private val profileId: String,
       val json = JSONObject(response)
       json.getJSONArray("DiskCxts")
         .map { gson.fromJson(it.toString(), DiskCxtResponse::class.java) }
-        .firstOrNull { isDiskAvailable(it) }?.DiskId
+        .firstOrNull { isDiskAvailable(it, prefix) }?.DiskId
     } catch (e: Exception) {
       logger.info("List disk failed", e)
       null
@@ -83,7 +83,11 @@ class NeteaseDiskProvider(private val profileId: String,
   }
 
   fun getDockerDisk() = async(context) {
-    getAvailableDisk().await() ?: createDisk().await()
+    getAvailableDisk(DOCKER_DISK_PREFIX).await() ?: createDisk(DOCKER_DISK_PREFIX).await()
+  }
+
+  fun getWorkDisk() = async(context) {
+    getAvailableDisk(WORK_DISK_PREFIX).await() ?: createDisk(WORK_DISK_PREFIX).await()
   }
 
   fun removeDisk(diskId: Int) = launch(context) {
@@ -106,8 +110,8 @@ class NeteaseDiskProvider(private val profileId: String,
     context.close()
   }
 
-  private fun isDiskAvailable(disk: DiskCxtResponse) : Boolean {
-    return disk.DiskName.startsWith(DOCKER_DISK_PREFIX) &&
+  private fun isDiskAvailable(disk: DiskCxtResponse, prefix: String) : Boolean {
+    return disk.DiskName.startsWith(prefix) &&
       disk.ZoneId == constants.NETEASE_ZONE_ID &&
       disk.AttachedInstance.isBlank() &&
       disk.Type == DISK_TYPE
