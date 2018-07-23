@@ -41,6 +41,14 @@ open class Constants {
 
   val ENV_SERVER_URL = "SERVER_URL"
 
+  val ENV_YARN_CACHE_FOLDER = "YARN_CACHE_FOLDER"
+
+  val ENV_YARN_CACHE_FOLDER_VALUE = "/var/lib/docker/yarn/"
+
+  val ENV_GRADLE_USER_HOME = "GRADLE_USER_HOME"
+
+  val ENV_GRADLE_USER_HOME_VALUE = "/var/lib/docker/gradle/"
+
   companion object {
     fun buildLogger() = Loggers.ACTIVITIES!!
   }

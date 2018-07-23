@@ -200,6 +200,14 @@ class NeteaseCloudClient(
               jsonObject(
                 "Name" to ENV_INSTANCE_NAME,
                 "Value" to name
+              ),
+              jsonObject(
+                "Name" to ENV_YARN_CACHE_FOLDER,
+                "Value" to ENV_YARN_CACHE_FOLDER_VALUE
+              ),
+              jsonObject(
+                "Name" to ENV_GRADLE_USER_HOME,
+                "Value" to ENV_GRADLE_USER_HOME_VALUE
               )
             ),
             "SecurityContext" to jsonObject(
