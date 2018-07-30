@@ -86,7 +86,7 @@ class NeteaseCloudInstance(
         "NamespaceId" to config.namespaceId.toString(),
         "StatefulWorkloadId" to workloadId.toString()
       )
-    ).request().await()
+    ).request()
   }
 
   suspend fun forceRestart() {
@@ -98,7 +98,7 @@ class NeteaseCloudInstance(
         "NamespaceId" to config.namespaceId.toString(),
         "StatefulWorkloadId" to workloadId.toString()
       )
-    ).request().await()
+    ).request()
   }
 
   override fun close() {

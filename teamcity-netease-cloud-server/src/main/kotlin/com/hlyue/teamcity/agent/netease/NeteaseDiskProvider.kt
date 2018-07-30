@@ -37,7 +37,7 @@ class NeteaseDiskProvider(private val profileId: String,
           "Scope" to "NCS",
           "Capacity" to 30.toString()
         )
-      ).request().await()
+      ).request()
       val json = JSONObject(response)
       val id = json.getJSONArray("DiskIds").first() as Int
       while (true) {
@@ -50,7 +50,7 @@ class NeteaseDiskProvider(private val profileId: String,
             query = mapOf(
               "DiskId" to id.toString()
             )
-          ).request().await()
+          ).request()
         ).getJSONObject("DiskCxt")
         val status = jsonObject.getString("Status")
         if (status == "create_succ") break
@@ -71,7 +71,7 @@ class NeteaseDiskProvider(private val profileId: String,
         query = mapOf(
           "ZoneId" to constants.NETEASE_ZONE_ID
         )
-      ).request().await()
+      ).request()
       val json = JSONObject(response)
       json.getJSONArray("DiskCxts")
         .map { gson.fromJson(it.toString(), DiskCxtResponse::class.java) }
@@ -88,22 +88,6 @@ class NeteaseDiskProvider(private val profileId: String,
 
   fun getWorkDisk() = async(context) {
     getAvailableDisk(WORK_DISK_PREFIX).await() ?: createDisk(WORK_DISK_PREFIX).await()
-  }
-
-  fun removeDisk(diskId: Int) = launch(context) {
-    if (createdDisks.remove(diskId)) {
-      for (i in 1..5) {
-        delay(10, TimeUnit.SECONDS)
-        connector.NeteaseOpenApiRequestBuilder(
-          serviceName = "ncv",
-          version = "2017-12-28",
-          action = "DeleteDisk",
-          query = mapOf(
-            "DiskId" to diskId.toString()
-          )
-        ).request().await()
-      }
-    }
   }
 
   override fun close() {

@@ -3,17 +3,14 @@ package com.hlyue.teamcity.agent.netease
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
-import jetbrains.buildServer.web.openapi.PluginDescriptor
-import kotlinx.coroutines.experimental.*
-import org.python.antlr.ast.Str
-import org.python.util.PythonInterpreter
-import org.springframework.core.io.ClassPathResource
-import java.io.*
-import java.time.Instant
-import java.time.format.DateTimeFormatter
+import com.hlyue.teamcity.agent.netease.other.PythonRunner
+import kotlinx.coroutines.experimental.async
+import java.io.StringReader
 
-class NeteaseOpenApiConnector(private val accessKey: String,
-                              private val accessSecret: String) {
+class NeteaseOpenApiConnector(
+  private val accessKey: String,
+  private val accessSecret: String
+) {
 
   companion object {
     val host = "open.c.163.com"
@@ -21,7 +18,6 @@ class NeteaseOpenApiConnector(private val accessKey: String,
     val contentType = "application/json"
     val logger = Constants.buildLogger()
     val gson = Gson()
-    val context = newSingleThreadContext("connector")
   }
 
   inner class NeteaseOpenApiRequestBuilder(
@@ -33,8 +29,9 @@ class NeteaseOpenApiConnector(private val accessKey: String,
     val query: Map<String, String> = emptyMap()
   ) {
 
-    private fun buildArgs(): String {
-      val args = mutableListOf("./resources.py",
+    private fun buildArgs(): List<String> {
+      val args = mutableListOf(
+        "./resources.py",
         "--region=$zone",
         "--service=$serviceName",
         "--access-key=$accessKey",
@@ -50,41 +47,20 @@ class NeteaseOpenApiConnector(private val accessKey: String,
         if (it.isEmpty()) it else "&$it"
       }
       args.add("https://$host/$serviceName?Action=$action&Version=$version$additionQuery")
-      return args.joinToString(",") { "'$it'"}
+      return args
     }
 
-    fun request(): Deferred<String> = async(context) {
-      val interpreter = PythonInterpreter()
-      val out = ByteArrayOutputStream()
-      val err = ByteArrayOutputStream()
-      val args = buildArgs()
-      logger.info("args: $args")
-      interpreter.setOut(out)
-      interpreter.setErr(err)
-      interpreter.exec("""
-          import sys
-          sys.argv = [$args]
-      """.trimIndent())
-      try {
-        interpreter.execfile(Resources.signaturePy.byteInputStream(), "resources.py")
-      } catch (e: Throwable) {
-        logger.error(e)
-      }
-      val content = out.toByteArray()!!.toString(Charsets.UTF_8)
-      val type = object : TypeToken<List<String>>() { }.type
+    suspend fun request(): String {
+      val content = PythonRunner.runPythonScript(Resources.signaturePy, buildArgs()).await().first
+      val type = object : TypeToken<List<String>>() {}.type
       val reader = JsonReader(StringReader(content))
       reader.isLenient = true
       val list = gson.fromJson<List<String>>(reader, type)
-      val (stdout, stderr) = runCommand(list.map {
-        it.trim()
-      }.toTypedArray())
-      logger.info("curl out: $stdout")
-      interpreter.cleanup()
-      interpreter.close()
-      stdout
+      val (stdout, _) = runCommand(list.map { it.trim() }.toTypedArray()).await()
+      return stdout
     }
 
-    private fun runCommand(args: Array<String>): Pair<String, String> {
+    private fun runCommand(args: Array<String>) = async {
       logger.info("run command: ${args.joinToString(" ")}")
       val (output, error) = arrayOf(createTempFile(), createTempFile())
       output.deleteOnExit()
@@ -102,7 +78,7 @@ class NeteaseOpenApiConnector(private val accessKey: String,
       output.delete()
       error.delete()
 
-      return outputContent to errorContent
+      outputContent to errorContent
     }
   }
 }

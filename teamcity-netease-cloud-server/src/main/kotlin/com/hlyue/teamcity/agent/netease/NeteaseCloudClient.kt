@@ -49,7 +49,7 @@ class NeteaseCloudClient(
             query = mapOf(
               "NamespaceId" to config.namespaceId.toString()
             )
-          ).request().await()
+          ).request()
           val response = JSONObject(responseString).getJSONArray("StatefulWorkloads")
           val workloadIds = mutableListOf<Long>()
           response.forEach {
@@ -95,24 +95,6 @@ class NeteaseCloudClient(
       }
     }
   }
-
-  private suspend fun getInstanceInfo(config: NeteaseConfig, workloadId: Long): JSONObject? {
-    return try {
-      val response = connector.NeteaseOpenApiRequestBuilder(
-        action = "DescribeStatefulWorkloadInfo",
-        version = "2017-11-16",
-        serviceName = "ncs",
-        query = mapOf(
-          "NamespaceId" to config.namespaceId.toString(),
-          "StatefulWorkloadId" to workloadId.toString()
-        )
-      ).request().await()
-      JSONObject(response)
-    } catch (e: Exception) {
-      null
-    }
-  }
-
 
   override fun findInstanceByAgent(agent: AgentDescription): CloudInstance? {
     return instances.firstOrNull { agent.configurationParameters[ENV_INSTANCE_ID] == it.envWorkloadId }
@@ -204,6 +186,7 @@ class NeteaseCloudClient(
               jsonObject(
                 "Name" to ENV_YARN_CACHE_FOLDER,
                 "Value" to ENV_YARN_CACHE_FOLDER_VALUE
+
               ),
               jsonObject(
                 "Name" to ENV_GRADLE_USER_HOME,
@@ -231,7 +214,7 @@ class NeteaseCloudClient(
         serviceName = "ncs",
         version = "2017-11-16",
         data = request.toString()
-      ).request().await()
+      ).request()
       val json = gson.fromJson(response, StatefulWorkloadCreateResponse::class.java)
       instance.workloadId = json.StatefulWorkloadId
 

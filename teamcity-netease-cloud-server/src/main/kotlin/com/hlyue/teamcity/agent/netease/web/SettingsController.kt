@@ -24,7 +24,6 @@ class SettingsController(private val server: SBuildServer,
 
   private val myJspPath: String = pluginDescriptor.getPluginResourcesPath("settings.jsp")
   private val myHtmlPath: String = pluginDescriptor.getPluginResourcesPath("settings.html")
-  private val coroutineContext = newSingleThreadContext("jython")
   private val gson = Gson()
 
   val myLogger = buildLogger()
@@ -55,7 +54,7 @@ class SettingsController(private val server: SBuildServer,
     request(param, connector, context)
   }
 
-  fun request(param: PostRequest, connector: NeteaseOpenApiConnector, context: AsyncContext) = runBlocking {
+  fun request(param: PostRequest, connector: NeteaseOpenApiConnector, context: AsyncContext) = async {
     val res = when (param.resource) {
       "namespace" -> getNamespace(connector)
       "vpc" -> getVpc(connector)
@@ -64,11 +63,11 @@ class SettingsController(private val server: SBuildServer,
       else -> null
     }
     context.response.contentType = "application/json"
-    context.response.outputStream.write(res?.await()?.toByteArray())
+    context.response.outputStream.write(res?.toByteArray())
     context.complete()
   }
 
-  fun getNamespace(connector: NeteaseOpenApiConnector): Deferred<String> {
+  suspend fun getNamespace(connector: NeteaseOpenApiConnector): String {
     return connector.NeteaseOpenApiRequestBuilder(
       action = "DescribeNamespaces",
       serviceName = "ncs",
@@ -76,7 +75,7 @@ class SettingsController(private val server: SBuildServer,
     ).request()
   }
 
-  fun getVpc(connector: NeteaseOpenApiConnector): Deferred<String> {
+  suspend fun getVpc(connector: NeteaseOpenApiConnector): String {
     return connector.NeteaseOpenApiRequestBuilder(
       action = "ListVpc",
       serviceName = "vpc",
@@ -84,7 +83,7 @@ class SettingsController(private val server: SBuildServer,
     ).request()
   }
 
-  fun getSubnet(connector: NeteaseOpenApiConnector, vpcId: String): Deferred<String> {
+  suspend fun getSubnet(connector: NeteaseOpenApiConnector, vpcId: String): String {
     return connector.NeteaseOpenApiRequestBuilder(
       action = "ListSubnet",
       version = "2017-11-30",
@@ -95,7 +94,7 @@ class SettingsController(private val server: SBuildServer,
     ).request()
   }
 
-  fun getSecurityGroup(connector: NeteaseOpenApiConnector, vpcId: String): Deferred<String> {
+  suspend fun getSecurityGroup(connector: NeteaseOpenApiConnector, vpcId: String): String {
     return connector.NeteaseOpenApiRequestBuilder(
       action = "ListSecurityGroup",
       version = "2017-11-30",
