@@ -17,8 +17,6 @@ open class Constants {
 
   val PREFERENCE_ACCESS_KEY = "accessKey"
 
-  val PREFERENCE_SERVER_URL = "neteaseServerUrl"
-
   val PREFERENCE_ACCESS_SECRET = "accessSecret"
 
   val PREFERENCE_MACHINE_TYPE = "machineType"

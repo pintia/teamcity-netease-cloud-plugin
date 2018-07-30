@@ -14,7 +14,8 @@ import java.util.concurrent.TimeUnit
 
 class NeteaseCloudClient(
   private val profileId: String,
-  private val cloudClientParameters: CloudClientParameters
+  private val cloudClientParameters: CloudClientParameters,
+  private val serverUrl: String
 ) : CloudClientEx {
 
   companion object : Constants()
@@ -165,7 +166,7 @@ class NeteaseCloudClient(
             "Envs" to jsonArray(
               jsonObject(
                 "Name" to ENV_SERVER_URL,
-                "Value" to config.serverUrl
+                "Value" to serverUrl
               ),
               jsonObject(
                 "Name" to ENV_INSTANCE_ID,
