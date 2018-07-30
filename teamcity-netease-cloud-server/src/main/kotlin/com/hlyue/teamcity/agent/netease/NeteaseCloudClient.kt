@@ -208,6 +208,10 @@ class NeteaseCloudClient(
               jsonObject(
                 "Name" to ENV_GRADLE_USER_HOME,
                 "Value" to ENV_GRADLE_USER_HOME_VALUE
+              ),
+              jsonObject(
+                "Name" to ENV_AGENT_OPTS,
+                "Value" to ENV_AGENT_OPTS_VALUE
               )
             ),
             "SecurityContext" to jsonObject(

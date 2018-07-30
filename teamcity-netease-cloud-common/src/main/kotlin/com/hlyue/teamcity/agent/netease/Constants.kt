@@ -49,6 +49,10 @@ open class Constants {
 
   val ENV_GRADLE_USER_HOME_VALUE = "/var/lib/docker/gradle/"
 
+  val ENV_AGENT_OPTS = "AGENT_OPTS"
+
+  val ENV_AGENT_OPTS_VALUE = "workDir=/var/lib/docker/tc/work/ tempDir=/var/lib/docker/tc/temp/"
+
   companion object {
     fun buildLogger() = Loggers.ACTIVITIES!!
   }
