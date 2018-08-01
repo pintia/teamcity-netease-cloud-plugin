@@ -35,6 +35,13 @@
     </td>
 </tr>
 <tr>
+    <th><label for="${constants.PREFERENCE_IMAGE_TAG}">Agent image (Teamcity official image): <l:star/></label></th>
+    <td>
+        <select name="${constants.PREFERENCE_IMAGE_TAG}" class="longField" >
+        </select>
+    </td>
+</tr>
+<tr>
     <th><label for="${constants.PREFERENCE_NAMESPACE}">Namespace: <l:star/></label></th>
     <td>
         <select name="${constants.PREFERENCE_NAMESPACE}" class="longField" >
@@ -70,6 +77,7 @@
     let subnetName = "${constants.PREFERENCE_SUBNET}"
     let securityGroupName = "${constants.PREFERENCE_SECURITY_GROUP}"
     let machineTypeName = "${constants.PREFERENCE_MACHINE_TYPE}"
+    let imageTagName = "${constants.PREFERENCE_IMAGE_TAG}"
 
     let accessKey = "${propertiesBean.properties[constants.PREFERENCE_ACCESS_KEY]}"
     let accessSecret = "${propertiesBean.properties[constants.PREFERENCE_ACCESS_SECRET]}"
@@ -78,6 +86,7 @@
     let subnet = "${propertiesBean.properties[constants.PREFERENCE_SUBNET]}"
     let securityGroup = "${propertiesBean.properties[constants.PREFERENCE_SECURITY_GROUP]}"
     let machineType = "${propertiesBean.properties[constants.PREFERENCE_MACHINE_TYPE]}"
+    let imageTag = "${propertiesBean.properties[constants.PREFERENCE_IMAGE_TAG]}"
 
     let optionDefault = {
         text: '',
@@ -88,6 +97,7 @@
     let vpcOptions = options.slice(0)
     let subnetOptions = options.slice(0)
     let securityGroupOptions = options.slice(0)
+    let imageTagOptions = options.slice(0)
     let machineTypeOptions = options.slice(0)
     <c:forEach items="${constants.MACHINE_TYPE_LIST}" var="item">
         machineTypeOptions.push({
@@ -133,6 +143,7 @@
         bindSelect(subnetName, subnetOptions, subnet)
         bindSelect(securityGroupName, securityGroupOptions, securityGroup)
         bindSelect(machineTypeName, machineTypeOptions, machineType)
+        bindSelect(imageTagName, imageTagOptions, imageTag)
     }
 
     function post(data, callback) {
@@ -191,11 +202,19 @@
         }, 'SecurityGroups')
     }
 
+    function loadImageTag() {
+        loadAndSetOptions(imageTagOptions, 'repoTags', {}, 'Tags', (item) => ({
+            value: item.Tag,
+            text: item.Tag
+        }))
+    }
+
     function loadAll() {
         loadSubnet()
         loadNamespace()
         loadVpc()
         loadSecurityGroup()
+        loadImageTag()
     }
 
     (() => {
@@ -222,6 +241,10 @@
             })
             getSelectDom(machineTypeName).change(function() {
                 machineType = $j(this).find('option:selected').val()
+                doBind()
+            })
+            getSelectDom(imageTagName).change(function() {
+                imageTag = $j(this).find('option:selected').val()
                 doBind()
             })
             $j("input[name='prop:${constants.PREFERENCE_ACCESS_KEY}']").change(function() {

@@ -19,6 +19,8 @@ open class Constants {
 
   val PREFERENCE_ACCESS_SECRET = "accessSecret"
 
+  val PREFERENCE_IMAGE_TAG = "imageTag"
+
   val PREFERENCE_MACHINE_TYPE = "machineType"
 
   val PREFERENCE_NAMESPACE = "namespace"

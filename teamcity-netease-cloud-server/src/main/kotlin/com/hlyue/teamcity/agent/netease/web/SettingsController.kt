@@ -22,6 +22,7 @@ class SettingsController(private val server: SBuildServer,
 
   private companion object : Constants()
 
+  private val AGENT_REPO_ID = 87523 // Shared from patest account.
   private val myJspPath: String = pluginDescriptor.getPluginResourcesPath("settings.jsp")
   private val myHtmlPath: String = pluginDescriptor.getPluginResourcesPath("settings.html")
   private val gson = Gson()
@@ -60,6 +61,7 @@ class SettingsController(private val server: SBuildServer,
       "vpc" -> getVpc(connector)
       "subnet" -> getSubnet(connector, param.params["VpcId"] ?: "")
       "securityGroup" -> getSecurityGroup(connector, param.params["VpcId"] ?: "")
+      "repoTags" -> getImageTags(connector)
       else -> null
     }
     context.response.contentType = "application/json"
@@ -101,6 +103,17 @@ class SettingsController(private val server: SBuildServer,
       serviceName = "vpc",
       query = mapOf(
         "VpcId" to vpcId
+      )
+    ).request()
+  }
+
+  suspend fun getImageTags(connector: NeteaseOpenApiConnector): String {
+    return connector.NeteaseOpenApiRequestBuilder(
+      action = "DescribeTags",
+      version = "2018-03-08",
+      serviceName = "ccr",
+      query = mapOf(
+        "RepositoryId" to AGENT_REPO_ID.toString()
       )
     ).request()
   }

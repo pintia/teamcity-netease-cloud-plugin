@@ -157,7 +157,7 @@ class NeteaseCloudClient(
         "Containers" to jsonArray(
           jsonObject(
             "Name" to name,
-            "Image" to "hub.c.163.com/patest/teamcity-agent:2018.1",
+            "Image" to "hub.c.163.com/patest/teamcity-agent:${config.imageTag}",
             "LogDirs" to jsonArray("/opt/buildagent/logs/"),
             "ResourceRequirements" to jsonObject(
               "Limits" to StatefulWorkloadCreateRequest.REQUIREMENTS[config.machineType],
