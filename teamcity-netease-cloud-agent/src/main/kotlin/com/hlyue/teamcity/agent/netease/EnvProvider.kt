@@ -13,12 +13,13 @@ class EnvProvider(agentEvents: EventDispatcher<AgentLifeCycleListener>,
 
       override fun afterAgentConfigurationLoaded(agent: BuildAgent) {
         super.afterAgentConfigurationLoaded(agent)
-        appendEcsSpecificConfiguration()
+        appendConfiguration()
       }
 
       override fun buildStarted(runningBuild: AgentRunningBuild) {
         super.buildStarted(runningBuild)
         val logger = runningBuild.buildLogger
+        // TODO: currently netease high performance container will set dns search domain.
         logger.logMessage(DefaultMessagesInfo.createTextMessage("ready to fix netease dns", Status.NORMAL))
         try {
           fixNeteaseDns(logger)
@@ -32,7 +33,7 @@ class EnvProvider(agentEvents: EventDispatcher<AgentLifeCycleListener>,
 
   companion object: Constants()
 
-  private fun appendEcsSpecificConfiguration() {
+  private fun appendConfiguration() {
     val environment = System.getenv()
     val tcAgentId = environment[ENV_NETEASE_TC_AGENT] ?: ""
     val instanceId = environment[ENV_INSTANCE_ID] ?: ""
