@@ -4,8 +4,8 @@
         <name>cloud-netease</name>
         <display-name>Netease Cloud Agents</display-name>
         <version>@Version@</version>
-        <description>Allow use netease cloud containers as build agent.</description>
-        <download-url>https://github.com/JetBrains/teamcity-google-agent</download-url>
+        <description>Allow to use netease cloud (163yun) containers as build agent.</description>
+        <download-url>https://github.com/richard1122/teamcity-netease-cloud-plugin</download-url>
         <vendor>
             <name>Richard He</name>
             <url>https://blog.hlyue.com/</url>
