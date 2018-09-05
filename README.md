@@ -35,7 +35,7 @@ Install plugin and
   * ENV_INSTANCE_ID (an internal agent id)
   * YARN_CACHE_FOLDER: /var/lib/docker/yarn/
   * GRADLE_USER_HOME: /var/lib/docker/gradle/
-  * AGENT_OPTS: workDir=/var/lib/docker/tc/work/ tempDir=/var/lib/docker/tc/temp/
+  * AGENT_OPTS: workDir=/var/lib/docker/tc/work/ tempDir=/var/lib/docker/tc/temp/ toolsDir=/var/lib/docker/tc/tools/ pluginsDir=/var/lib/docker/tc/plugins/ systemDir=/var/lib/docker/tc/system/
 
 ## Limitation
 

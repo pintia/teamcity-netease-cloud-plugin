@@ -51,7 +51,11 @@ open class Constants {
 
   val ENV_AGENT_OPTS = "AGENT_OPTS"
 
-  val ENV_AGENT_OPTS_VALUE = "workDir=/var/lib/docker/tc/work/ tempDir=/var/lib/docker/tc/temp/"
+  val ENV_AGENT_OPTS_VALUE = "workDir=/var/lib/docker/tc/work/" +
+    " tempDir=/var/lib/docker/tc/temp/" +
+    " toolsDir=/var/lib/docker/tc/tools/" +
+    " pluginsDir=/var/lib/docker/tc/plugins/" +
+    " systemDir=/var/lib/docker/tc/system/"
 
   companion object {
     fun buildLogger() = Loggers.ACTIVITIES!!
