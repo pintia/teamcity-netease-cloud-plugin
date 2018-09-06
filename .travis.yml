@@ -1,3 +1,11 @@
 language: java
 script:
   - ./gradlew build
+deploy:
+  provider: releases
+  api_key:
+    secure: "fRGMi+wzS8CCOyXLpmw2rV05rZ5oUB4kYFBrMz9gYNjVzGY6a9+EyF+3U0rMgRd/sLFFrWJ+l1pgGYx5KaFlDtjo5SVhUq0Coc/ISMzNmgJncuRPBMlAj0WTpNDkgm9QOQcMTInAmdzZIKEM7mNAZ6ZmOlUpUmuOYVoFUBDFhHUHGeBX/89SSe6JkUchT7XowssctLpvsc+SGPsWOt8yWN/E423aZwYNB54ghb8lJbmi/ta387YEXUP1EX2PNcBlnIDdxrbbMaxJeFVMSvdZavZTLTUK2huW3Tv9q1IrHvUE9PrpaLjNnjm0D17AZPfqO8EvyfnY6kRDwjvGW5TLcThp7kSTcw8jHXDAWneRwiAe0ozUo2pVbTRaTiuMkjLCposgziE/FjI0eJzWbgPILxIcK2QnrhPdv8samqkeyX+E48+kI2YRXO+MLLMb8OE6fE2J1eGLHDfUfuWRqvga92lh6//jde4zzeIBQAuPjcoPrEnI66904BKmPwMSfKxUjuFwX/hkA67r80TO1Ss6yc0d8mccCkefqwbtfXHPENqE1nI8ZqrojpSEuoZlEHZU5E+BxXVL+kisbzPQF5P6O0cjS1UP9YNga4Or4sWOjz8HoQ1Axvre30qrQwMsowC4TqHZHg9DjPSCdVB1Qp4OcZlt6/NCAL68gV3X/k8eXzg="
+  file: "/teamcity-netease-cloud-server/build/distributions/teamcity-netease-cloud.zip"
+  skip_cleanup: true
+  on:
+    tags: true
