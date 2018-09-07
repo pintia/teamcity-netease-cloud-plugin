@@ -20,7 +20,7 @@ class NeteaseCloudClient(
 
   companion object : Constants()
   // 15 seconds * 12 = 3 minutes. This usually means creation failed.
-  private val MAX_ERROR_COUNT = 8
+  private val MAX_ERROR_COUNT = 20
 
   val instances = mutableListOf<NeteaseCloudInstance>()
 
