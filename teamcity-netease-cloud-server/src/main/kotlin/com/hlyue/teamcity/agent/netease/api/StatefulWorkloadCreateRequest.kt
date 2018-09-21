@@ -17,6 +17,10 @@ class StatefulWorkloadCreateRequest {
       "ncs.n1.large8" to jsonObject(
         "Cpu" to "4000",
         "Memory" to "8192"
+      ),
+      "ncs.n1.large16" to jsonObject(
+        "Cpu" to "4000",
+        "Memory" to "16384"
       )
     )
   }

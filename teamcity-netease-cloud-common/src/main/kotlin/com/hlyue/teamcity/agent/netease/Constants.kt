@@ -31,7 +31,7 @@ open class Constants {
 
   val PREFERENCE_SECURITY_GROUP = "securityGroup"
 
-  val MACHINE_TYPE_LIST = listOf("ncs.n1.small2", "ncs.n1.medium4", "ncs.n1.large8")
+  val MACHINE_TYPE_LIST = listOf("ncs.n1.small2", "ncs.n1.medium4", "ncs.n1.large8", "ncs.n1.large16")
 
   val ENV_INSTANCE_ID = "INSTANCE_ID"
 
