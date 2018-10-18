@@ -110,7 +110,7 @@ class NeteaseCloudClient(
   }
 
   override fun canStartNewInstance(image: CloudImage): Boolean {
-    return instances.size < 5
+    return instances.size < 10
   }
 
   override fun isInitialized(): Boolean {
