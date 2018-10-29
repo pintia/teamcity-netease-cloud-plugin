@@ -3,11 +3,11 @@ plugins {
 }
 
 ext {
-    pluginVersion = "1.0.5"
-    teamcityVersion = findProperty("teamcityVersion") ?: "10.0"
+    pluginVersion = "1.0.6"
+    teamcityVersion = findProperty("teamcityVersion") ?: "10.0.4"
     def correctVersion = project.hasProperty('pluginVersion') && property('pluginVersion') ==~ /\d+\.\d+\.\d+.*/
     versionNumber = correctVersion ? property('pluginVersion') : 'SNAPSHOT-' + new Date().format('yyyyMMddHHmmss')
-    kotlinVersion = "1.2.51"
+    kotlinVersion = "1.2.71"
     kotlinxVersion = "0.19.3"
 }
 
@@ -31,6 +31,9 @@ subprojects {
     targetCompatibility = "1.6"
     repositories {
         mavenCentral()
+        maven {
+            url = 'http://repository.jetbrains.com/all'
+        }
     }
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"

@@ -48,7 +48,8 @@ class EnvProvider(agentEvents: EventDispatcher<AgentLifeCycleListener>,
 
   private fun fixNeteaseDns(logger: BuildProgressLogger) {
     val file = File("/etc/resolv.conf")
-    logger.logMessage(DefaultMessagesInfo.createTextMessage("Current resolve file: ${file.readText()}"))
-    file.writeText("nameserver 114.114.114.114")
+    val current = file.readText()
+    logger.logMessage(DefaultMessagesInfo.createTextMessage("Current resolve file: $current"))
+    file.writeText("nameserver 10.126.16.11\n$current")
   }
 }
