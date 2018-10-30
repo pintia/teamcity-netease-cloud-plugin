@@ -35,7 +35,7 @@ class NeteaseDiskProvider(private val profileId: String,
           "Name" to name,
           "Type" to DISK_TYPE,
           "Scope" to "NCS",
-          "Capacity" to 30.toString()
+          "Capacity" to 60.toString()
         )
       ).request()
       val json = JSONObject(response)

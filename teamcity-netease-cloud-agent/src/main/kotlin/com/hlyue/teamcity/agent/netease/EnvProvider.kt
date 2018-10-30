@@ -8,6 +8,9 @@ import java.io.File
 
 class EnvProvider(agentEvents: EventDispatcher<AgentLifeCycleListener>,
                   private val agentConfigurationEx: BuildAgentConfigurationEx) {
+
+  private val NS_SERVER = "10.126.16.11"
+
   init {
     agentEvents.addListener(object : AgentLifeCycleAdapter() {
 
@@ -49,7 +52,8 @@ class EnvProvider(agentEvents: EventDispatcher<AgentLifeCycleListener>,
   private fun fixNeteaseDns(logger: BuildProgressLogger) {
     val file = File("/etc/resolv.conf")
     val current = file.readText()
+    if (current.contains(NS_SERVER)) return
     logger.logMessage(DefaultMessagesInfo.createTextMessage("Current resolve file: $current"))
-    file.writeText("nameserver 10.126.16.11\n$current")
+    file.writeText("nameserver $NS_SERVER\n$current")
   }
 }
