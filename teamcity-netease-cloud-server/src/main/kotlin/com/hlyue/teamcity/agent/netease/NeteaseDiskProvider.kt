@@ -13,12 +13,10 @@ class NeteaseDiskProvider(private val profileId: String,
 
   companion object {
     val DOCKER_DISK_PREFIX = "tc-agent-docker-"
-    val WORK_DISK_PREFIX = "tc-agent-work-"
-    val DISK_TYPE = "CloudHighPerformanceSsd"
+    val DISK_TYPE = "CloudSsd"
   }
   private val constants = Constants()
   private val context = newSingleThreadContext("disk-$profileId")
-  private val createdDisks = mutableListOf<Int>()
   private val logger = Constants.buildLogger()
   private val gson = Gson()
 
@@ -84,10 +82,6 @@ class NeteaseDiskProvider(private val profileId: String,
 
   fun getDockerDisk() = async(context) {
     getAvailableDisk(DOCKER_DISK_PREFIX).await() ?: createDisk(DOCKER_DISK_PREFIX).await()
-  }
-
-  fun getWorkDisk() = async(context) {
-    getAvailableDisk(WORK_DISK_PREFIX).await() ?: createDisk(WORK_DISK_PREFIX).await()
   }
 
   override fun close() {

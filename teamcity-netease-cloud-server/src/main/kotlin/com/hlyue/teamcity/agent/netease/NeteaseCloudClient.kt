@@ -151,7 +151,7 @@ class NeteaseCloudClient(
           "agent-id" to instance.envWorkloadId,
           "profile-id" to profileId
         ),
-        "ContainerType" to "HighPerformance",
+        "ContainerType" to "Standard",
         "NamespaceId" to config.namespaceId,
         "Name" to name,
         "Containers" to jsonArray(
@@ -202,7 +202,7 @@ class NeteaseCloudClient(
               "Privilege" to true
             ),
             "DataDisks" to jsonArray(jsonObject(
-              "DiskType" to "CloudHighPerformanceSsd",
+              "DiskType" to NeteaseDiskProvider.DISK_TYPE,
               "MountPath" to "/var/lib/docker/",
               "DiskId" to dockerDiskId
             ))

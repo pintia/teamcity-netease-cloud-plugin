@@ -19,18 +19,6 @@ class EnvProvider(agentEvents: EventDispatcher<AgentLifeCycleListener>,
         appendConfiguration()
       }
 
-      override fun buildStarted(runningBuild: AgentRunningBuild) {
-        super.buildStarted(runningBuild)
-        val logger = runningBuild.buildLogger
-        // TODO: currently netease high performance container will set dns search domain.
-        logger.logMessage(DefaultMessagesInfo.createTextMessage("ready to fix netease dns", Status.NORMAL))
-        try {
-          fixNeteaseDns(logger)
-          logger.logMessage(DefaultMessagesInfo.createTextMessage("fix netease dns success"))
-        } catch (e: Exception) {
-          logger.logMessage(DefaultMessagesInfo.createError(e))
-        }
-      }
     })
   }
 
@@ -49,11 +37,4 @@ class EnvProvider(agentEvents: EventDispatcher<AgentLifeCycleListener>,
     agentConfigurationEx.name = name
   }
 
-  private fun fixNeteaseDns(logger: BuildProgressLogger) {
-    val file = File("/etc/resolv.conf")
-    val current = file.readText()
-    if (current.contains(NS_SERVER)) return
-    logger.logMessage(DefaultMessagesInfo.createTextMessage("Current resolve file: $current"))
-    file.writeText("nameserver $NS_SERVER\n$current")
-  }
 }
