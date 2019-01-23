@@ -50,8 +50,8 @@ class NeteaseOpenApiConnector(
       return args
     }
 
-    fun request(): String {
-      val content = PythonRunner.runPythonScript(Resources.signaturePy, buildArgs()).first
+    suspend fun request(): String {
+      val content = PythonRunner.runPythonScript(Resources.signaturePy, buildArgs()).await().first
       val type = object : TypeToken<List<String>>() {}.type
       val reader = JsonReader(StringReader(content))
       reader.isLenient = true
