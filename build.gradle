@@ -1,14 +1,14 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.2.50"
+    id("org.jetbrains.kotlin.jvm") version "1.3.11"
 }
 
 ext {
-    pluginVersion = "1.0.8"
+    pluginVersion = "1.0.9"
     teamcityVersion = findProperty("teamcityVersion") ?: "10.0.4"
     def correctVersion = project.hasProperty('pluginVersion') && property('pluginVersion') ==~ /\d+\.\d+\.\d+.*/
     versionNumber = correctVersion ? property('pluginVersion') : 'SNAPSHOT-' + new Date().format('yyyyMMddHHmmss')
-    kotlinVersion = "1.2.71"
-    kotlinxVersion = "0.19.3"
+    kotlinVersion = "1.3.11"
+    kotlinxVersion = "1.1.0"
 }
 
 repositories {
@@ -27,8 +27,8 @@ subprojects {
     test.useTestNG()
     jar.version = null
 
-    sourceCompatibility = "1.6"
-    targetCompatibility = "1.6"
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
     repositories {
         mavenCentral()
         maven {

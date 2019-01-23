@@ -2,26 +2,25 @@ package com.hlyue.teamcity.agent.netease
 
 import com.google.gson.Gson
 import com.hlyue.teamcity.agent.netease.api.DiskCxtResponse
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.*
 import org.apache.commons.lang3.RandomStringUtils
 import org.json.JSONObject
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
 
 class NeteaseDiskProvider(private val profileId: String,
-                          private val connector: NeteaseOpenApiConnector):Closeable {
+                          private val connector: NeteaseOpenApiConnector) {
 
   companion object {
     val DOCKER_DISK_PREFIX = "tc-agent-docker-"
     val DISK_TYPE = "CloudSsd"
   }
   private val constants = Constants()
-  private val context = newSingleThreadContext("disk-$profileId")
   private val logger = Constants.buildLogger()
   private val gson = Gson()
 
-  private fun createDisk(prefix: String) = async(context) {
-    try {
+  private suspend fun createDisk(prefix: String): Int {
+    return try {
       val name = "$prefix${RandomStringUtils.randomAlphabetic(4).toLowerCase()}"
       val response = connector.NeteaseOpenApiRequestBuilder(
         serviceName = "ncv",
@@ -39,7 +38,7 @@ class NeteaseDiskProvider(private val profileId: String,
       val json = JSONObject(response)
       val id = json.getJSONArray("DiskIds").first() as Int
       while (true) {
-        delay(5, TimeUnit.SECONDS)
+        delay(5 * 1000)
         val jsonObject = JSONObject(
           connector.NeteaseOpenApiRequestBuilder(
             serviceName = "ncv",
@@ -60,8 +59,8 @@ class NeteaseDiskProvider(private val profileId: String,
     }
   }
 
-  private fun getAvailableDisk(prefix: String) = async(context) {
-    try {
+  private suspend fun getAvailableDisk(prefix: String): Int? {
+    return try {
       val response = connector.NeteaseOpenApiRequestBuilder(
         serviceName = "ncv",
         action = "ListDisk",
@@ -80,12 +79,8 @@ class NeteaseDiskProvider(private val profileId: String,
     }
   }
 
-  fun getDockerDisk() = async(context) {
-    getAvailableDisk(DOCKER_DISK_PREFIX).await() ?: createDisk(DOCKER_DISK_PREFIX).await()
-  }
-
-  override fun close() {
-    context.close()
+  suspend fun getDockerDisk(): Int {
+    return getAvailableDisk(DOCKER_DISK_PREFIX) ?: createDisk(DOCKER_DISK_PREFIX)
   }
 
   private fun isDiskAvailable(disk: DiskCxtResponse, prefix: String) : Boolean {

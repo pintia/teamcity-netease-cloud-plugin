@@ -8,7 +8,7 @@ import jetbrains.buildServer.controllers.*
 import jetbrains.buildServer.serverSide.SBuildServer
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import jetbrains.buildServer.web.openapi.WebControllerManager
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.*
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.ModelAndView
 import javax.servlet.AsyncContext
@@ -55,7 +55,7 @@ class SettingsController(private val server: SBuildServer,
     request(param, connector, context)
   }
 
-  fun request(param: PostRequest, connector: NeteaseOpenApiConnector, context: AsyncContext) = async {
+  fun request(param: PostRequest, connector: NeteaseOpenApiConnector, context: AsyncContext) = GlobalScope.async {
     val res = when (param.resource) {
       "namespace" -> getNamespace(connector)
       "vpc" -> getVpc(connector)

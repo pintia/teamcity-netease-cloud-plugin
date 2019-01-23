@@ -1,7 +1,7 @@
 package com.hlyue.teamcity.agent.netease
 
 import com.google.gson.Gson
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.runBlocking
 import org.apache.commons.lang3.RandomStringUtils
 
 fun main(argv: Array<String>) = runBlocking {

@@ -6,7 +6,7 @@ import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.InstanceStatus
 import jetbrains.buildServer.clouds.InstanceStatus.*
 import jetbrains.buildServer.serverSide.AgentDescription
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.*
 import org.apache.commons.lang3.RandomStringUtils
 import org.json.JSONObject
 import java.io.Closeable
@@ -19,7 +19,7 @@ class NeteaseCloudInstance(
   private val neteaseCloudImage: NeteaseCloudImage,
   private val connector: NeteaseOpenApiConnector,
   private val config: NeteaseConfig
-) : CloudInstance, Closeable {
+) : CloudInstance {
 
   companion object : Constants()
 
@@ -30,7 +30,7 @@ class NeteaseCloudInstance(
 
   private var lastError: CloudErrorInfo? = null
   private val now = Instant.now()
-  private val context = newSingleThreadContext("instance:$envWorkloadId")
+
   @Volatile
   var mStatus: InstanceStatus = SCHEDULED_TO_START
 
@@ -101,7 +101,4 @@ class NeteaseCloudInstance(
     ).request()
   }
 
-  override fun close() {
-    context.close()
-  }
 }

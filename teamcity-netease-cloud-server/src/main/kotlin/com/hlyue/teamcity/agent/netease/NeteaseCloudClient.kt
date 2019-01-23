@@ -8,9 +8,8 @@ import com.hlyue.teamcity.agent.netease.api.StatefulWorkloadCreateResponse
 import com.hlyue.teamcity.agent.netease.other.NameGenerator
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.serverSide.AgentDescription
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.*
 import org.json.JSONObject
-import java.util.concurrent.TimeUnit
 
 class NeteaseCloudClient(
   private val profileId: String,
@@ -32,16 +31,15 @@ class NeteaseCloudClient(
   )
   private val diskProvider = NeteaseDiskProvider(profileId, connector)
   private val logger = Constants.buildLogger()
-  private val context = newSingleThreadContext("NeteaseClient-${cloudClientParameters.profileDescription}")
   private val backgroundJob: Job
   private var lastError: CloudErrorInfo? = null
 
   init {
-    backgroundJob = launch(context) {
+    backgroundJob = GlobalScope.launch {
       var responseString = ""
       while (true) {
         try {
-          delay(15, TimeUnit.SECONDS)
+          delay(15 * 1000)
           val config = NeteaseConfig.buildFromCloudConfig(cloudClientParameters)
           responseString = connector.NeteaseOpenApiRequestBuilder(
             action = "DescribeStatefulWorkloads",
@@ -67,27 +65,6 @@ class NeteaseCloudClient(
               if (instance.errorCount >= MAX_ERROR_COUNT) {
                 terminateInstanceAsync(instance)
               }
-            } else {
-              // TODO: auto discover
-//              val info = getInstanceInfo(config, id)
-//              if (info != null) {
-//                val label = gson.fromJson(info.getJSONObject("Labels").toString(), WorkloadLabels::class.java)
-//                if (label.isAgent(profileId)) {
-//                  // A new agent discovered. Typically when startup
-//                  instances.add(NeteaseCloudInstance(info.getString("Name"), image, connector, config, 0).also {
-//                    it.workloadId = id
-//                    it.setStatus(info.getString("Status"))
-//                  })
-//                }
-//              }
-            }
-          }
-          instances.removeAll {
-            if (!workloadIds.contains(it.workloadId)) {
-              terminateInstanceAsync(it)
-              true
-            } else {
-              false
             }
           }
         } catch (e: Exception) {
@@ -125,7 +102,7 @@ class NeteaseCloudClient(
     return listOf(image)
   }
 
-  override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): NeteaseCloudInstance = runBlocking(context) {
+  override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): NeteaseCloudInstance = runBlocking {
     lastError = null
     var response: String? = null
 
@@ -133,7 +110,7 @@ class NeteaseCloudClient(
       val config = NeteaseConfig.buildFromCloudConfig(cloudClientParameters)
       val myImage = image as NeteaseCloudImage
       val name = "tc-" + NameGenerator.generate()
-      val dockerDiskId = diskProvider.getDockerDisk().await()
+      val dockerDiskId = diskProvider.getDockerDisk()
       val instance = NeteaseCloudInstance(name, myImage, connector, config)
 
       val request = jsonObject(
@@ -229,22 +206,21 @@ class NeteaseCloudClient(
     }
   }
 
-  private fun terminateInstanceAsync(instance: CloudInstance) = async(context) {
-    launch {
-      delay(30, TimeUnit.SECONDS)
+  private suspend fun terminateInstanceAsync(instance: CloudInstance) {
+    GlobalScope.launch {
+      delay(30 * 1000)
       instances.remove(instance)
     }
     (instance as NeteaseCloudInstance).let {
       it.terminate()
-      it.close()
     }
   }
 
-  override fun terminateInstance(instance: CloudInstance) = runBlocking(context) {
-    terminateInstanceAsync(instance).await()
+  override fun terminateInstance(instance: CloudInstance) = runBlocking {
+    terminateInstanceAsync(instance)
   }
 
-  override fun restartInstance(instance: CloudInstance) = runBlocking(context) {
+  override fun restartInstance(instance: CloudInstance) = runBlocking {
     (instance as NeteaseCloudInstance).forceRestart()
   }
 
@@ -253,7 +229,6 @@ class NeteaseCloudClient(
     backgroundJob.cancel()
     instances.forEach {
       it.terminate()
-      it.close()
     }
     instances.clear()
   }

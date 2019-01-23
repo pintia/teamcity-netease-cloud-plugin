@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.hlyue.teamcity.agent.netease.other.PythonRunner
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.async
 import java.io.StringReader
 
 class NeteaseOpenApiConnector(
@@ -50,17 +50,17 @@ class NeteaseOpenApiConnector(
       return args
     }
 
-    suspend fun request(): String {
-      val content = PythonRunner.runPythonScript(Resources.signaturePy, buildArgs()).await().first
+    fun request(): String {
+      val content = PythonRunner.runPythonScript(Resources.signaturePy, buildArgs()).first
       val type = object : TypeToken<List<String>>() {}.type
       val reader = JsonReader(StringReader(content))
       reader.isLenient = true
       val list = gson.fromJson<List<String>>(reader, type)
-      val (stdout, _) = runCommand(list.map { it.trim() }.toTypedArray()).await()
+      val (stdout, _) = runCommand(list.map { it.trim() }.toTypedArray())
       return stdout
     }
 
-    private fun runCommand(args: Array<String>) = async {
+    private fun runCommand(args: Array<String>): Pair<String, String> {
       logger.info("run command: ${args.joinToString(" ")}")
       val (output, error) = arrayOf(createTempFile(), createTempFile())
       output.deleteOnExit()
@@ -78,7 +78,7 @@ class NeteaseOpenApiConnector(
       output.delete()
       error.delete()
 
-      outputContent to errorContent
+      return outputContent to errorContent
     }
   }
 }
