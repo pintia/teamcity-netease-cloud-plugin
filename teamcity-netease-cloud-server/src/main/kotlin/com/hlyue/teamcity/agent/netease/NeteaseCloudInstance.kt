@@ -35,7 +35,7 @@ class NeteaseCloudInstance(
   var mStatus: InstanceStatus = SCHEDULED_TO_START
 
   fun setStatus(status: String) {
-    if (mStatus == STOPPING) return // stopping means instance was deleted from netease cloud, and will disappear soon.
+    if (mStatus == STOPPED) return // stopped means instance was deleted from netease cloud, and will disappear soon.
     mStatus = when (status) {
     //https://www.163yun.com/help/documents/157254714362351616
       "Creating" -> STARTING
@@ -79,7 +79,7 @@ class NeteaseCloudInstance(
   }
 
   suspend fun terminate() {
-    this.mStatus = STOPPING
+    this.mStatus = STOPPED
     connector.NeteaseOpenApiRequestBuilder(
       action = "DeleteStatefulWorkload",
       version = "2017-11-16",
