@@ -66,6 +66,13 @@ class NeteaseCloudClient(
               }
             }
           }
+          instances.filterNot { workloadIds.contains(it.workloadId) }
+            .let {
+              it.forEach {
+                terminateInstanceAsync(it)
+              }
+              instances.removeAll(it)
+            }
         } catch (e: Exception) {
           lastError = CloudErrorInfo("backgroudJob", responseString, e)
         }
