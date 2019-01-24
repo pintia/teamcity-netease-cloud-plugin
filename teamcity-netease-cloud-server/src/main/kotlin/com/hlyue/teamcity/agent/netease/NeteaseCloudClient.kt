@@ -3,7 +3,6 @@ package com.hlyue.teamcity.agent.netease
 import com.github.salomonbrys.kotson.jsonArray
 import com.github.salomonbrys.kotson.jsonObject
 import com.google.gson.Gson
-import com.hlyue.teamcity.agent.netease.api.StatefulWorkloadCreateRequest
 import com.hlyue.teamcity.agent.netease.api.StatefulWorkloadCreateResponse
 import com.hlyue.teamcity.agent.netease.other.NameGenerator
 import jetbrains.buildServer.clouds.*
@@ -137,8 +136,8 @@ class NeteaseCloudClient(
             "Image" to "hub.c.163.com/patest/teamcity-agent:${config.imageTag}",
             "LogDirs" to jsonArray("/opt/buildagent/logs/"),
             "ResourceRequirements" to jsonObject(
-              "Limits" to StatefulWorkloadCreateRequest.REQUIREMENTS[config.machineType],
-              "Requests" to StatefulWorkloadCreateRequest.REQUIREMENTS[config.machineType]
+              "Limits" to REQUIREMENTS[config.machineType],
+              "Requests" to REQUIREMENTS[config.machineType]
             ),
             "Envs" to jsonArray(
               jsonObject(
@@ -211,9 +210,7 @@ class NeteaseCloudClient(
       delay(30 * 1000)
       instances.remove(instance)
     }
-    (instance as NeteaseCloudInstance).let {
-      it.terminate()
-    }
+    (instance as NeteaseCloudInstance).terminate()
   }
 
   override fun terminateInstance(instance: CloudInstance) = runBlocking {

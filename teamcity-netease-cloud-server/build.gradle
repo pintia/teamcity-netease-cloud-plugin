@@ -26,7 +26,6 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion"
     compile 'org.json:json:+'
-    compile 'com.github.salomonbrys.kotson:kotson:2.5.0'
     compile group: 'org.python', name: 'jython-standalone', version: '2.7.1'
 
     provided "org.jetbrains.teamcity:cloud-interface:$teamcityVersion"

@@ -1,5 +1,6 @@
 package com.hlyue.teamcity.agent.netease
 
+import com.github.salomonbrys.kotson.jsonObject
 import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.log.Loggers
 
@@ -31,7 +32,30 @@ open class Constants {
 
   val PREFERENCE_SECURITY_GROUP = "securityGroup"
 
-  val MACHINE_TYPE_LIST = listOf("ncs.n1.small2", "ncs.n1.medium4", "ncs.n1.large8", "ncs.n1.large16")
+  val REQUIREMENTS = mapOf(
+    "ncs.n1.small2" to jsonObject(
+      "Cpu" to "1000",
+      "Memory" to "2048"
+    ),
+    "ncs.n1.medium4" to jsonObject(
+      "Cpu" to "2000",
+      "Memory" to "4096"
+    ),
+    "ncs.n1.medium8" to jsonObject(
+      "Cpu" to "2000",
+      "Memory" to "8192"
+    ),
+    "ncs.n1.large8" to jsonObject(
+      "Cpu" to "4000",
+      "Memory" to "8192"
+    ),
+    "ncs.n1.large16" to jsonObject(
+      "Cpu" to "4000",
+      "Memory" to "16384"
+    )
+  )
+
+  val MACHINE_TYPE_LIST = REQUIREMENTS.keys.toList()
 
   val ENV_INSTANCE_ID = "INSTANCE_ID"
 

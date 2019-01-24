@@ -4,7 +4,7 @@ Run teamcity agents on 163yun container service.
 
 ## Compatibility
 
-Tested on teamcity 2018.1.x.
+Tested on teamcity 2018.1, 2018.2.
 
 163yun: currently only support cn-east-1b zone (in vpc).
 
@@ -21,7 +21,6 @@ Install plugin and
 * vpc
 * subnet
 * security group
-* (optional) server url
 
 ## Agent Env
 
@@ -39,4 +38,4 @@ Install plugin and
 
 ## Limitation
 
-* Currently java SDK is not provided by 163yun. A jython runtime is included in plugin for api. This will be deleted once java SDK is provided.
+* Currently java SDK is not provided by 163yun. A jython runtime is included in plugin for api. This will be removed once java SDK provided.
