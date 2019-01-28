@@ -82,7 +82,7 @@ open class Constants {
     " systemDir=/var/lib/docker/tc/system/"
 
   companion object {
-    fun buildLogger() = Loggers.ACTIVITIES!!
+    fun buildLogger() = Logger.getInstance(Loggers.CLOUD_CATEGORY_ROOT + "NETEASE")
   }
 
 

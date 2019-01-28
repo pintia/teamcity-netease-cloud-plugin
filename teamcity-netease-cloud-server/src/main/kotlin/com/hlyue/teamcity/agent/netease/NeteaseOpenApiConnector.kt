@@ -56,7 +56,13 @@ class NeteaseOpenApiConnector(
       val reader = JsonReader(StringReader(content))
       reader.isLenient = true
       val list = gson.fromJson<List<String>>(reader, type)
-      val (stdout, _) = runCommand(list.map { it.trim() }.toTypedArray())
+      val (stdout, _) = try {
+        runCommand(list.map { it.trim() }.toTypedArray())
+      } catch (e: Exception) {
+        logger.error("netease response with exception", e)
+        throw e
+      }
+      logger.info("netease response: $stdout".trimIndent())
       return stdout
     }
 
