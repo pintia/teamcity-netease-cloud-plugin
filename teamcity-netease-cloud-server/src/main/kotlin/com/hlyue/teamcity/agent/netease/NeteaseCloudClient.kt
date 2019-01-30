@@ -66,13 +66,11 @@ class NeteaseCloudClient(
               }
             }
           }
-          instances.filterNot { workloadIds.contains(it.workloadId) }
-            .let {
-              it.forEach {
-                terminateInstanceAsync(it)
-              }
-              instances.removeAll(it)
-            }
+          instances.removeAll {
+            // Not created by netease, or we terminated it before.
+            // we can remove it here.
+            !workloadIds.contains(it.workloadId)
+          }
         } catch (e: Exception) {
           lastError = CloudErrorInfo("backgroudJob", responseString, e)
         }
@@ -213,10 +211,6 @@ class NeteaseCloudClient(
   }
 
   private suspend fun terminateInstanceAsync(instance: CloudInstance) {
-    GlobalScope.launch {
-      delay(30 * 1000)
-      instances.remove(instance)
-    }
     (instance as NeteaseCloudInstance).terminate()
   }
 
@@ -229,7 +223,6 @@ class NeteaseCloudClient(
   }
 
   override fun dispose() = runBlocking {
-    logger.info("dispose:")
     backgroundJob.cancel()
     instances.forEach {
       it.terminate()
