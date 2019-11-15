@@ -32,6 +32,8 @@ open class Constants {
 
   val PREFERENCE_SECURITY_GROUP = "securityGroup"
 
+  val PREFERENCE_DISK_SIZE = "diskSize"
+
   val REQUIREMENTS = mapOf(
     "ncs.n1.small2" to jsonObject(
       "Cpu" to "1000",

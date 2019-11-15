@@ -42,7 +42,7 @@ class NeteaseCloudClientFactory(
     }
     var serverUrl = params.getParameter("profileServerUrl")
     if (serverUrl.isNullOrEmpty()) serverUrl = serverSettings.rootUrl
-    return NeteaseCloudClient(state.profileId, params, serverUrl!!)
+    return NeteaseCloudClient(state.profileId, params, serverUrl)
   }
 
   override fun getCloudCode(): String = CLOUD_CODE

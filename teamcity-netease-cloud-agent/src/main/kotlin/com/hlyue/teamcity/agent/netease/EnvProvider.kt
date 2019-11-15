@@ -9,8 +9,6 @@ import java.io.File
 class EnvProvider(agentEvents: EventDispatcher<AgentLifeCycleListener>,
                   private val agentConfigurationEx: BuildAgentConfigurationEx) {
 
-  private val NS_SERVER = "10.126.16.11"
-
   init {
     agentEvents.addListener(object : AgentLifeCycleAdapter() {
 

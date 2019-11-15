@@ -114,7 +114,7 @@ class NeteaseCloudClient(
       val config = NeteaseConfig.buildFromCloudConfig(cloudClientParameters)
       val myImage = image as NeteaseCloudImage
       val name = "tc-" + NameGenerator.generate()
-      val dockerDiskId = diskProvider.getDockerDisk()
+      val dockerDiskId = diskProvider.getDockerDisk(config)
       val instance = NeteaseCloudInstance(name, myImage, connector, config)
 
       val request = jsonObject(

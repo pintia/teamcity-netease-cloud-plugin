@@ -65,7 +65,7 @@ class SettingsController(private val server: SBuildServer,
       else -> null
     }
     context.response.contentType = "application/json"
-    context.response.outputStream.write(res?.toByteArray())
+    context.response.outputStream.print(res)
     context.complete()
   }
 

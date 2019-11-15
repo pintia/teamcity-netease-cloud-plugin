@@ -19,7 +19,7 @@ class NeteaseDiskProvider(private val profileId: String,
   private val logger = Constants.buildLogger()
   private val gson = Gson()
 
-  private suspend fun createDisk(prefix: String): Int {
+  private suspend fun createDisk(prefix: String, config: NeteaseConfig): Int {
     return try {
       val name = "$prefix${RandomStringUtils.randomAlphabetic(4).toLowerCase()}"
       val response = connector.NeteaseOpenApiRequestBuilder(
@@ -32,7 +32,7 @@ class NeteaseDiskProvider(private val profileId: String,
           "Name" to name,
           "Type" to DISK_TYPE,
           "Scope" to "NCS",
-          "Capacity" to 60.toString()
+          "Capacity" to config.diskSize.toString()
         )
       ).request()
       val json = JSONObject(response)
@@ -79,8 +79,8 @@ class NeteaseDiskProvider(private val profileId: String,
     }
   }
 
-  suspend fun getDockerDisk(): Int {
-    return getAvailableDisk(DOCKER_DISK_PREFIX) ?: createDisk(DOCKER_DISK_PREFIX)
+  suspend fun getDockerDisk(config: NeteaseConfig): Int {
+    return getAvailableDisk(DOCKER_DISK_PREFIX) ?: createDisk(DOCKER_DISK_PREFIX, config)
   }
 
   private fun isDiskAvailable(disk: DiskCxtResponse, prefix: String) : Boolean {

@@ -17,6 +17,15 @@
     </td>
 </tr>
 <tr>
+    <th><label for="${constants.PREFERENCE_DISK_SIZE}">Disk Size (GB): <l:star/></label></th>
+    <td>
+        <div>
+            <input name="prop:${constants.PREFERENCE_DISK_SIZE}" class="longField"
+                   value="${propertiesBean.properties[constants.PREFERENCE_DISK_SIZE]}" />
+        </div>
+    </td>
+</tr>
+<tr>
     <th><label for="prop:${constants.PREFERENCE_ACCESS_KEY}">Access key: <l:star/></label></th>
     <td>
         <div>
@@ -86,6 +95,7 @@
     let subnet = "${propertiesBean.properties[constants.PREFERENCE_SUBNET]}"
     let securityGroup = "${propertiesBean.properties[constants.PREFERENCE_SECURITY_GROUP]}"
     let machineType = "${propertiesBean.properties[constants.PREFERENCE_MACHINE_TYPE]}"
+    let diskSize = "${propertiesBean.properties[constants.PREFERENCE_DISK_SIZE]}"
     let imageTag = "${propertiesBean.properties[constants.PREFERENCE_IMAGE_TAG]}"
 
     let optionDefault = {
@@ -138,6 +148,7 @@
     function doBind() {
         $j("input[name='prop:${constants.PREFERENCE_ACCESS_KEY}']").val(accessKey)
         $j("input[name='prop:${constants.PREFERENCE_ACCESS_SECRET}']").val(accessSecret)
+        $j("input[name='prop:${constants.PREFERENCE_DISK_SIZE}']").val(diskSize)
         bindSelect(namespaceName, namespaceOptions, namespace)
         bindSelect(vpcName, vpcOptions, vpc)
         bindSelect(subnetName, subnetOptions, subnet)
@@ -245,6 +256,10 @@
             })
             getSelectDom(imageTagName).change(function() {
                 imageTag = $j(this).find('option:selected').val()
+                doBind()
+            })
+            $j("input[name='prop:${constants.PREFERENCE_DISK_SIZE}']").change(function() {
+                diskSize = this.value
                 doBind()
             })
             $j("input[name='prop:${constants.PREFERENCE_ACCESS_KEY}']").change(function() {
