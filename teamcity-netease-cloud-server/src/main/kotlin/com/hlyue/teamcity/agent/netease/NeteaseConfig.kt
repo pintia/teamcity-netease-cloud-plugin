@@ -20,7 +20,9 @@ class NeteaseConfig private constructor(
 
   val namespaceId: Long,
 
-  val imageTag: String
+  val imageTag: String,
+
+  val diskSize: Int
 
 ) {
 
@@ -37,6 +39,7 @@ class NeteaseConfig private constructor(
       val securityGroupId = getParameter(cloudClientParameters, constants.PREFERENCE_SECURITY_GROUP)
       val namespaceId = getParameter(cloudClientParameters, constants.PREFERENCE_NAMESPACE)
       val imageTag = getParameter(cloudClientParameters, constants.PREFERENCE_IMAGE_TAG)
+      val diskSize = getParameter(cloudClientParameters, constants.PREFERENCE_DISK_SIZE)
 
       return NeteaseConfig(
         accessKey = accessKey,
@@ -46,14 +49,15 @@ class NeteaseConfig private constructor(
         subnetId = subnetId,
         securityGroupId = securityGroupId,
         namespaceId = namespaceId.toLong(),
-        imageTag = imageTag
+        imageTag = imageTag,
+        diskSize = diskSize.toInt()
       )
     }
 
     private fun getParameter(clientParameters: CloudClientParameters, key: String): String {
       val value = clientParameters.getParameter(key)
       if (value.isNullOrBlank()) throw ParameterNullException(key)
-      return value!!
+      return value
     }
 
     class ParameterNullException(name: String): NullPointerException("$name should not be null")

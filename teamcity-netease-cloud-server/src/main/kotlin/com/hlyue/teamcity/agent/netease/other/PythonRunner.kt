@@ -24,22 +24,22 @@ class PythonRunner {
       val err = ByteArrayOutputStream()
       interpreter.setOut(out)
       interpreter.setErr(err)
-
-      if (args.isNotEmpty()) {
-        interpreter.exec(
-          """
-          import sys
-          sys.argv = [${args.joinToString(",") { "'${it.replace("\'", "\\'")}'" }}]
-      """.trimIndent()
-        )
-      }
       try {
+        if (args.isNotEmpty()) {
+          interpreter.exec(
+            """
+            import sys
+            sys.argv = [${args.joinToString(",") { "'${it.replace("\'", "\\'")}'" }}]
+            """.trimIndent()
+          )
+        }
         interpreter.execfile(script.byteInputStream(), fileName)
       } catch (e: Throwable) {
         NeteaseOpenApiConnector.logger.error(e)
+      } finally {
+        interpreter.cleanup()
+        interpreter.close()
       }
-      interpreter.cleanup()
-      interpreter.close()
       listOf(out, err).map { it.toByteArray().toString(Charsets.UTF_8) }.let { it[0] to it[1] }
     }
 
