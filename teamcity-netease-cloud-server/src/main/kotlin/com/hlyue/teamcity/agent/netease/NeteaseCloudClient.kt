@@ -36,7 +36,7 @@ class NeteaseCloudClient(
   init {
     backgroundJob = GlobalScope.launch {
       var responseString = ""
-      while (true) {
+      while (isActive) {
         try {
           delay(15 * 1000)
           val config = NeteaseConfig.buildFromCloudConfig(cloudClientParameters)
