@@ -14,6 +14,7 @@ class NeteaseDiskProvider(private val profileId: String,
   companion object {
     val DOCKER_DISK_PREFIX = "tc-agent-docker-"
     val DISK_TYPE = "CloudSsd"
+    val LIST_DISK_LIMIT = "10000"
   }
   private val constants = Constants()
   private val logger = Constants.buildLogger()
@@ -66,7 +67,8 @@ class NeteaseDiskProvider(private val profileId: String,
         action = "ListDisk",
         version = "2017-12-28",
         query = mapOf(
-          "ZoneId" to constants.NETEASE_ZONE_ID
+          "ZoneId" to constants.NETEASE_ZONE_ID,
+          "Limit" to LIST_DISK_LIMIT
         )
       ).request()
       val json = JSONObject(response)

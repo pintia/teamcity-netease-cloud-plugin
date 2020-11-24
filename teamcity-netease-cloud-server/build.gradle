@@ -32,5 +32,3 @@ dependencies {
     provided "org.jetbrains.teamcity:cloud-shared:$teamcityVersion"
     provided "org.jetbrains.teamcity.internal:server:$teamcityVersion"
 }
-
-kotlin { experimental { coroutines 'enable' } }

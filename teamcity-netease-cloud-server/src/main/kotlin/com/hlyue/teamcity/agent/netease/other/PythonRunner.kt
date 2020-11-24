@@ -11,7 +11,7 @@ class PythonRunner {
 
     val context = newSingleThreadContext("PythonRunner")
 
-    fun runPythonScript(
+    fun runPythonScriptAsync(
       script: String,
       args: List<String> = emptyList(),
       fileName: String = "request.py"
@@ -42,6 +42,5 @@ class PythonRunner {
       }
       listOf(out, err).map { it.toByteArray().toString(Charsets.UTF_8) }.let { it[0] to it[1] }
     }
-
   }
 }
