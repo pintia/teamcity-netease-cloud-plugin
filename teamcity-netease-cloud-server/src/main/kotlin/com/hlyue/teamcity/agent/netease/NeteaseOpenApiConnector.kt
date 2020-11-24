@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.hlyue.teamcity.agent.netease.other.PythonRunner
-import kotlinx.coroutines.async
 import java.io.StringReader
 
 class NeteaseOpenApiConnector(
@@ -51,7 +50,7 @@ class NeteaseOpenApiConnector(
     }
 
     suspend fun request(): String {
-      val content = PythonRunner.runPythonScript(Resources.signaturePy, buildArgs()).await().first
+      val content = PythonRunner.runPythonScriptAsync(Resources.signaturePy, buildArgs()).await().first
       val type = object : TypeToken<List<String>>() {}.type
       val reader = JsonReader(StringReader(content))
       reader.isLenient = true
