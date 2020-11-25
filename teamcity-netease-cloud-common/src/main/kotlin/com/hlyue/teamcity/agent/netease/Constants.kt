@@ -20,6 +20,8 @@ open class Constants {
 
   val PREFERENCE_ACCESS_SECRET = "accessSecret"
 
+  val PREFERENCE_REPOSITORY_ID = "repositoryId"
+
   val PREFERENCE_IMAGE_TAG = "imageTag"
 
   val PREFERENCE_MACHINE_TYPE = "machineType"
@@ -31,6 +33,8 @@ open class Constants {
   val PREFERENCE_SUBNET = "subnet"
 
   val PREFERENCE_SECURITY_GROUP = "securityGroup"
+
+  val PREFERENCE_CREATE_DISK = "createDisk"
 
   val PREFERENCE_DISK_SIZE = "diskSize"
 

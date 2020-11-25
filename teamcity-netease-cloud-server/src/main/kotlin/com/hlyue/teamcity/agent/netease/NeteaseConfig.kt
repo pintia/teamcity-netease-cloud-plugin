@@ -20,7 +20,11 @@ class NeteaseConfig private constructor(
 
   val namespaceId: Long,
 
+  val repositoryId: Long,
+
   val imageTag: String,
+
+  val createDisk: Boolean,
 
   val diskSize: Int
 
@@ -38,7 +42,9 @@ class NeteaseConfig private constructor(
       val subnetId = getParameter(cloudClientParameters, constants.PREFERENCE_SUBNET)
       val securityGroupId = getParameter(cloudClientParameters, constants.PREFERENCE_SECURITY_GROUP)
       val namespaceId = getParameter(cloudClientParameters, constants.PREFERENCE_NAMESPACE)
+      val repositoryId = getParameter(cloudClientParameters, constants.PREFERENCE_REPOSITORY_ID)
       val imageTag = getParameter(cloudClientParameters, constants.PREFERENCE_IMAGE_TAG)
+      val createDisk = getParameter(cloudClientParameters, constants.PREFERENCE_CREATE_DISK)
       val diskSize = getParameter(cloudClientParameters, constants.PREFERENCE_DISK_SIZE)
 
       return NeteaseConfig(
@@ -49,7 +55,9 @@ class NeteaseConfig private constructor(
         subnetId = subnetId,
         securityGroupId = securityGroupId,
         namespaceId = namespaceId.toLong(),
+        repositoryId = repositoryId.toLong(),
         imageTag = imageTag,
+        createDisk = createDisk.toBoolean(),
         diskSize = diskSize.toInt()
       )
     }

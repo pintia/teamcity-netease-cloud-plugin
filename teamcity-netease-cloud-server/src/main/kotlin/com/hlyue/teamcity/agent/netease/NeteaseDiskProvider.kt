@@ -6,7 +6,9 @@ import kotlinx.coroutines.*
 import org.apache.commons.lang3.RandomStringUtils
 import org.json.JSONObject
 import java.io.Closeable
+import java.lang.RuntimeException
 import java.util.concurrent.TimeUnit
+import kotlin.time.*
 
 class NeteaseDiskProvider(private val profileId: String,
                           private val connector: NeteaseOpenApiConnector) {
@@ -82,7 +84,20 @@ class NeteaseDiskProvider(private val profileId: String,
   }
 
   suspend fun getDockerDisk(config: NeteaseConfig): Int {
-    return getAvailableDisk(DOCKER_DISK_PREFIX) ?: createDisk(DOCKER_DISK_PREFIX, config)
+    var disk: Int? = null
+    var waits = 0
+    while (disk == null) {
+      disk = getAvailableDisk(DOCKER_DISK_PREFIX)
+        ?: if (config.createDisk) createDisk(DOCKER_DISK_PREFIX, config) else null
+      if (waits > 180) {
+        // Already waited for 30 minutes, abort mission.
+        throw RuntimeException("No available disks after 30 minutes waiting, abort.")
+      }
+      logger.info("No available disks, waiting for 10 seconds...")
+      waits++
+      delay(10000)
+    }
+    return disk
   }
 
   private fun isDiskAvailable(disk: DiskCxtResponse, prefix: String) : Boolean {
