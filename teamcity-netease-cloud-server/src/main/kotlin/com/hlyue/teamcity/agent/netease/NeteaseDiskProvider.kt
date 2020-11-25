@@ -16,7 +16,7 @@ class NeteaseDiskProvider(private val profileId: String,
   companion object {
     val DOCKER_DISK_PREFIX = "tc-agent-docker-"
     val DISK_TYPE = "CloudSsd"
-    val LIST_DISK_LIMIT = "10000"
+    val LIST_DISK_LIMIT = "100"
   }
   private val constants = Constants()
   private val logger = Constants.buildLogger()
@@ -89,13 +89,15 @@ class NeteaseDiskProvider(private val profileId: String,
     while (disk == null) {
       disk = getAvailableDisk(DOCKER_DISK_PREFIX)
         ?: if (config.createDisk) createDisk(DOCKER_DISK_PREFIX, config) else null
-      if (waits > 180) {
-        // Already waited for 30 minutes, abort mission.
-        throw RuntimeException("No available disks after 30 minutes waiting, abort.")
+      if (disk == null) {
+        if (waits > 180) {
+          // Already waited for 30 minutes, abort mission.
+          throw RuntimeException("No available disks after 30 minutes waiting, abort.")
+        }
+        logger.info("No available disks, waiting for 10 seconds...")
+        waits++
+        delay(10000)
       }
-      logger.info("No available disks, waiting for 10 seconds...")
-      waits++
-      delay(10000)
     }
     return disk
   }

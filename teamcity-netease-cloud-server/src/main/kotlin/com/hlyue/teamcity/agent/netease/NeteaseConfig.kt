@@ -1,8 +1,6 @@
 package com.hlyue.teamcity.agent.netease
 
-import com.google.common.base.Strings
 import jetbrains.buildServer.clouds.CloudClientParameters
-import java.util.*
 
 class NeteaseConfig private constructor(
 
@@ -24,6 +22,8 @@ class NeteaseConfig private constructor(
 
   val imageTag: String,
 
+  val imageFullTag: String,
+
   val createDisk: Boolean,
 
   val diskSize: Int
@@ -44,6 +44,7 @@ class NeteaseConfig private constructor(
       val namespaceId = getParameter(cloudClientParameters, constants.PREFERENCE_NAMESPACE)
       val repositoryId = getParameter(cloudClientParameters, constants.PREFERENCE_REPOSITORY_ID)
       val imageTag = getParameter(cloudClientParameters, constants.PREFERENCE_IMAGE_TAG)
+      val imageFullTag = getParameter(cloudClientParameters, constants.PREFERENCE_IMAGE_FULL_TAG)
       val createDisk = getParameter(cloudClientParameters, constants.PREFERENCE_CREATE_DISK)
       val diskSize = getParameter(cloudClientParameters, constants.PREFERENCE_DISK_SIZE)
 
@@ -57,7 +58,8 @@ class NeteaseConfig private constructor(
         namespaceId = namespaceId.toLong(),
         repositoryId = repositoryId.toLong(),
         imageTag = imageTag,
-        createDisk = createDisk.toBoolean(),
+        imageFullTag = imageFullTag,
+        createDisk = createDisk.toInt() == 1,
         diskSize = diskSize.toInt()
       )
     }

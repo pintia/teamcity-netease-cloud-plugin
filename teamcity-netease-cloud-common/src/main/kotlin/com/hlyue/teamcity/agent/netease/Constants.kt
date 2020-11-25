@@ -24,6 +24,8 @@ open class Constants {
 
   val PREFERENCE_IMAGE_TAG = "imageTag"
 
+  val PREFERENCE_IMAGE_FULL_TAG = "imageFullTag"
+
   val PREFERENCE_MACHINE_TYPE = "machineType"
 
   val PREFERENCE_NAMESPACE = "namespace"
