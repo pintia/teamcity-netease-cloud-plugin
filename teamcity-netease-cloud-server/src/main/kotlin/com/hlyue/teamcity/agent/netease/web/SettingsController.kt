@@ -61,7 +61,8 @@ class SettingsController(private val server: SBuildServer,
       "vpc" -> getVpc(connector)
       "subnet" -> getSubnet(connector, param.params["VpcId"] ?: "")
       "securityGroup" -> getSecurityGroup(connector, param.params["VpcId"] ?: "")
-      "repoTags" -> getImageTags(connector)
+      "repositories" -> listRepos(connector)
+      "repoTags" -> getImageTags(connector, param.params["RepositoryId"] ?: "")
       else -> null
     }
     context.response.contentType = "application/json"
@@ -107,13 +108,24 @@ class SettingsController(private val server: SBuildServer,
     ).request()
   }
 
-  suspend fun getImageTags(connector: NeteaseOpenApiConnector): String {
+  suspend fun listRepos(connector: NeteaseOpenApiConnector): String {
+    return connector.NeteaseOpenApiRequestBuilder(
+      action = "DescribeRepositories",
+      version = "2018-03-08",
+      serviceName = "ccr",
+      query = mapOf(
+        "Limit" to "100"
+      )
+    ).request()
+  }
+
+  suspend fun getImageTags(connector: NeteaseOpenApiConnector, repositoryId: String): String {
     return connector.NeteaseOpenApiRequestBuilder(
       action = "DescribeTags",
       version = "2018-03-08",
       serviceName = "ccr",
       query = mapOf(
-        "RepositoryId" to AGENT_REPO_ID.toString()
+        "RepositoryId" to repositoryId
       )
     ).request()
   }

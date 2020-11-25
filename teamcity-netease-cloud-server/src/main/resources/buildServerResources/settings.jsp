@@ -17,7 +17,16 @@
     </td>
 </tr>
 <tr>
-    <th><label for="${constants.PREFERENCE_DISK_SIZE}">Disk Size (GB): <l:star/></label></th>
+    <th><label for="prop:${constants.PREFERENCE_CREATE_DISK}_disp">Create disk: </label></th>
+    <td>
+        <div>
+            <input name="prop:${constants.PREFERENCE_CREATE_DISK}_disp" type="checkbox" />
+            <input name="prop:${constants.PREFERENCE_CREATE_DISK}" type="hidden" />
+        </div>
+    </td>
+</tr>
+<tr>
+    <th><label for="prop:${constants.PREFERENCE_DISK_SIZE}">Disk Size (GB): <l:star/></label></th>
     <td>
         <div>
             <input name="prop:${constants.PREFERENCE_DISK_SIZE}" class="longField"
@@ -44,7 +53,14 @@
     </td>
 </tr>
 <tr>
-    <th><label for="${constants.PREFERENCE_IMAGE_TAG}">Agent image (Teamcity official image): <l:star/></label></th>
+    <th><label for="${constants.PREFERENCE_REPOSITORY_ID}">Agent image: <l:star/></label></th>
+    <td>
+        <select name="${constants.PREFERENCE_REPOSITORY_ID}" class="longField" >
+        </select>
+    </td>
+</tr>
+<tr>
+    <th><label for="${constants.PREFERENCE_IMAGE_TAG}">Agent image tag: <l:star/></label></th>
     <td>
         <select name="${constants.PREFERENCE_IMAGE_TAG}" class="longField" >
         </select>
@@ -86,6 +102,7 @@
     let subnetName = "${constants.PREFERENCE_SUBNET}"
     let securityGroupName = "${constants.PREFERENCE_SECURITY_GROUP}"
     let machineTypeName = "${constants.PREFERENCE_MACHINE_TYPE}"
+    let repositoryIdName = "${constants.PREFERENCE_REPOSITORY_ID}"
     let imageTagName = "${constants.PREFERENCE_IMAGE_TAG}"
 
     let accessKey = "${propertiesBean.properties[constants.PREFERENCE_ACCESS_KEY]}"
@@ -95,7 +112,9 @@
     let subnet = "${propertiesBean.properties[constants.PREFERENCE_SUBNET]}"
     let securityGroup = "${propertiesBean.properties[constants.PREFERENCE_SECURITY_GROUP]}"
     let machineType = "${propertiesBean.properties[constants.PREFERENCE_MACHINE_TYPE]}"
+    let createDisk = "${propertiesBean.properties[constants.PREFERENCE_CREATE_DISK]}" || "0"
     let diskSize = "${propertiesBean.properties[constants.PREFERENCE_DISK_SIZE]}"
+    let repositoryId = "${propertiesBean.properties[constants.PREFERENCE_REPOSITORY_ID]}"
     let imageTag = "${propertiesBean.properties[constants.PREFERENCE_IMAGE_TAG]}"
 
     let optionDefault = {
@@ -107,6 +126,7 @@
     let vpcOptions = options.slice(0)
     let subnetOptions = options.slice(0)
     let securityGroupOptions = options.slice(0)
+    let repositoryOptions = options.slice(0)
     let imageTagOptions = options.slice(0)
     let machineTypeOptions = options.slice(0)
     <c:forEach items="${constants.MACHINE_TYPE_LIST}" var="item">
@@ -148,12 +168,15 @@
     function doBind() {
         $j("input[name='prop:${constants.PREFERENCE_ACCESS_KEY}']").val(accessKey)
         $j("input[name='prop:${constants.PREFERENCE_ACCESS_SECRET}']").val(accessSecret)
+        $j("input[name='prop:${constants.PREFERENCE_CREATE_DISK}_disp']").get(0).checked = parseInt(createDisk)
+        $j("input[name='prop:${constants.PREFERENCE_CREATE_DISK}']").val(createDisk)
         $j("input[name='prop:${constants.PREFERENCE_DISK_SIZE}']").val(diskSize)
         bindSelect(namespaceName, namespaceOptions, namespace)
         bindSelect(vpcName, vpcOptions, vpc)
         bindSelect(subnetName, subnetOptions, subnet)
         bindSelect(securityGroupName, securityGroupOptions, securityGroup)
         bindSelect(machineTypeName, machineTypeOptions, machineType)
+        bindSelect(repositoryIdName, repositoryOptions, repositoryId)
         bindSelect(imageTagName, imageTagOptions, imageTag)
     }
 
@@ -213,8 +236,17 @@
         }, 'SecurityGroups')
     }
 
+    function loadRepository() {
+        loadAndSetOptions(repositoryOptions, 'repositories', {}, 'Repositories', (item) => ({
+            value: item.RepositoryId,
+            text: item.Name
+        }))
+    }
+
     function loadImageTag() {
-        loadAndSetOptions(imageTagOptions, 'repoTags', {}, 'Tags', (item) => ({
+        loadAndSetOptions(imageTagOptions, 'repoTags', {
+            RepositoryId: repositoryId
+        }, 'Tags', (item) => ({
             value: item.Tag,
             text: item.Tag
         }))
@@ -225,6 +257,7 @@
         loadNamespace()
         loadVpc()
         loadSecurityGroup()
+        loadRepository()
         loadImageTag()
     }
 
@@ -254,8 +287,17 @@
                 machineType = $j(this).find('option:selected').val()
                 doBind()
             })
+            getSelectDom(repositoryIdName).change(function() {
+                repositoryId = $j(this).find('option:selected').val()
+                loadImageTag()
+                doBind()
+            })
             getSelectDom(imageTagName).change(function() {
                 imageTag = $j(this).find('option:selected').val()
+                doBind()
+            })
+            $j("input[name='prop:${constants.PREFERENCE_CREATE_DISK}_disp']").change(function() {
+                createDisk = this.checked ? 1 : 0
                 doBind()
             })
             $j("input[name='prop:${constants.PREFERENCE_DISK_SIZE}']").change(function() {
