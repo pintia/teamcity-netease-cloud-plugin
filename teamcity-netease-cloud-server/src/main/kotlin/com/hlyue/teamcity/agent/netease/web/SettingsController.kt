@@ -22,7 +22,6 @@ class SettingsController(private val server: SBuildServer,
 
   private companion object : Constants()
 
-  private val AGENT_REPO_ID = 87523 // Shared from patest account.
   private val myJspPath: String = pluginDescriptor.getPluginResourcesPath("settings.jsp")
   private val myHtmlPath: String = pluginDescriptor.getPluginResourcesPath("settings.html")
   private val gson = Gson()

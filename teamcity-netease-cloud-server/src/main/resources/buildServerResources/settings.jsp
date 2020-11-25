@@ -64,6 +64,7 @@
     <td>
         <select name="${constants.PREFERENCE_IMAGE_TAG}" class="longField" >
         </select>
+        <input name="prop:${constants.PREFERENCE_IMAGE_FULL_TAG}" type="hidden" />
     </td>
 </tr>
 <tr>
@@ -116,6 +117,7 @@
     let diskSize = "${propertiesBean.properties[constants.PREFERENCE_DISK_SIZE]}"
     let repositoryId = "${propertiesBean.properties[constants.PREFERENCE_REPOSITORY_ID]}"
     let imageTag = "${propertiesBean.properties[constants.PREFERENCE_IMAGE_TAG]}"
+    let imageFullTag = "${propertiesBean.properties[constants.PREFERENCE_IMAGE_FULL_TAG]}"
 
     let optionDefault = {
         text: '',
@@ -171,6 +173,7 @@
         $j("input[name='prop:${constants.PREFERENCE_CREATE_DISK}_disp']").get(0).checked = parseInt(createDisk)
         $j("input[name='prop:${constants.PREFERENCE_CREATE_DISK}']").val(createDisk)
         $j("input[name='prop:${constants.PREFERENCE_DISK_SIZE}']").val(diskSize)
+        $j("input[name='prop:${constants.PREFERENCE_IMAGE_FULL_TAG}']").val(imageFullTag)
         bindSelect(namespaceName, namespaceOptions, namespace)
         bindSelect(vpcName, vpcOptions, vpc)
         bindSelect(subnetName, subnetOptions, subnet)
@@ -248,7 +251,8 @@
             RepositoryId: repositoryId
         }, 'Tags', (item) => ({
             value: item.Tag,
-            text: item.Tag
+            text: item.Tag,
+            full: item.TagUrl
         }))
     }
 
@@ -294,6 +298,7 @@
             })
             getSelectDom(imageTagName).change(function() {
                 imageTag = $j(this).find('option:selected').val()
+                imageFullTag = imageTagOptions.find(it => it.value === imageTag).full
                 doBind()
             })
             $j("input[name='prop:${constants.PREFERENCE_CREATE_DISK}_disp']").change(function() {
