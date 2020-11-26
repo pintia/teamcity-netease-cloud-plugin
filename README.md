@@ -1,31 +1,31 @@
-# Teamcity Netease (163yun) Cloud Agent
+# TeamCity Netease Cloud (163yun) Agent
 
-Run teamcity agents on 163yun container service.
+Run TeamCity agents on Netease Cloud container service.
 
 ## Compatibility
 
-Tested on teamcity 2018.1, 2018.2.
+Tested on TeamCity 2018.1, 2018.2, 2019.2.
 
-163yun: currently only support cn-east-1b zone (in vpc).
+Netease Cloud: Only support cn-east-1b zone (in VPC).
 
 ## Configuration
 
-Install plugin and
+Install the plugin and change settings:
 
-* access key
-* access secret
-* machine type (1c2g, 2c4g, 4c8g)
-* agent image (official teamcity agent docker image, shared from *patest* account)
-  https://c.163yun.com/hub#/m/repository/?repoId=87523
-* namespace
-* vpc
-* subnet
-* security group
+* Access Key
+* Access Secret
+* Machine Type (1c2g, 2c4g, 4c8g)
+* Agent image repo and tag (in your netease cloud account's image repo)
+* Create disk automatically option and disk size
+* Namespace
+* VPC
+* Subnet
+* Security Group
 
-## Agent Env
+## Agent Environment Variables
 
 * docker_in_docker mode
-* A high performance cloud disk is created and reused, mounted to /var/lib/docker/. It will not delete after agent destroy.
+* A high performance cloud disk will/should be created and reused, mounted to /var/lib/docker/. It will not be deleted after agent destroy.
 * cloud disk will cache docker images, yarn cache, gradle home and teamcity agent working directory.
 * with following envs:
   * SERVER_URL (for agent official image)
@@ -38,4 +38,4 @@ Install plugin and
 
 ## Limitation
 
-* Currently java SDK is not provided by 163yun. A jython runtime is included in plugin for api. This will be removed once java SDK provided.
+* Currently java SDK is not provided by Netease Cloud. A jython runtime is included in the plugin. This will be removed once official Netease Cloud java SDK provided.
