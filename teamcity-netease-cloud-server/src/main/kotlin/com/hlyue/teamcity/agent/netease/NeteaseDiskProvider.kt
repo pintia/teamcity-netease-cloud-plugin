@@ -96,7 +96,7 @@ class NeteaseDiskProvider(private val profileId: String,
         }
         logger.info("No available disks, waiting for 10 seconds...")
         waits++
-        delay(10000)
+        delay(10 * 1000)
       }
     }
     return disk
