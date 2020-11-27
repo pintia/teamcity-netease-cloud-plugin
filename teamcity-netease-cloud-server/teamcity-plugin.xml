@@ -4,10 +4,10 @@
         <name>cloud-netease</name>
         <display-name>Netease Cloud Agents</display-name>
         <version>@Version@</version>
-        <description>Allow to use netease cloud (163yun) containers as build agent.</description>
+        <description>Allow to use Netease Cloud (163yun, 网易蜂巢/网易数帆) containers as build agent.</description>
         <vendor>
-            <name>Richard He</name>
-            <url>https://blog.hlyue.com/</url>
+            <name>Pintia</name>
+            <url>https://www.pat-edu.com</url>
         </vendor>
     </info>
     <requirements min-build="40000" />
