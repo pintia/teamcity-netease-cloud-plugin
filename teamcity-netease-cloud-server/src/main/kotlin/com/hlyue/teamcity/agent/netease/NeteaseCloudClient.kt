@@ -13,7 +13,7 @@ import org.json.JSONObject
 class NeteaseCloudClient(
   private val profileId: String,
   private val cloudClientParameters: CloudClientParameters,
-  private val serverUrl: String
+  private val serverUrl: String,
 ) : CloudClientEx {
 
   companion object : Constants()
@@ -77,6 +77,9 @@ class NeteaseCloudClient(
       }
     }
   }
+
+  val agentPoolId: Int?
+    get() = cloudClientParameters.getParameter(PREFERENCE_AGENT_POOL)?.toInt()
 
   override fun findInstanceByAgent(agent: AgentDescription): CloudInstance? {
     return instances.firstOrNull { agent.configurationParameters[ENV_INSTANCE_ID] == it.envWorkloadId }

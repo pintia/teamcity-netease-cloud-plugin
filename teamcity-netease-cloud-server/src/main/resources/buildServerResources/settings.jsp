@@ -5,7 +5,9 @@
 <%@ taglib prefix="forms" tagdir="/WEB-INF/tags/forms" %>
 <%@ taglib prefix="util" uri="/WEB-INF/functions/util" %>
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
+<jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
 <jsp:useBean id="constants" class="com.hlyue.teamcity.agent.netease.Constants"/>
 <jsp:useBean id="basePath" class="java.lang.String" scope="request"/>
 
@@ -95,6 +97,17 @@
         </select>
     </td>
 </tr>
+<tr>
+    <th><label for="prop:${constants.PREFERENCE_AGENT_POOL}">Agent pool:<l:star/></label></th>
+    <td>
+        <select name="prop:${constants.PREFERENCE_AGENT_POOL}" class="longField">
+            <props:option value=""><c:out value="<Select agent pool>"/></props:option>
+            <c:forEach var="ap" items="${agentPools}">
+                <props:option selected="${ap.agentPoolId eq propertiesBean.properties[constants.PREFERENCE_AGENT_POOL]}" value="${ap.agentPoolId}"><c:out value="${ap.name}"/></props:option>
+            </c:forEach>
+        </select>
+    </td>
+</tr>
 <script>
     let accessKeyName = "${constants.PREFERENCE_ACCESS_KEY}"
     let accessSecretName = "${constants.PREFERENCE_ACCESS_SECRET}"
@@ -118,6 +131,7 @@
     let repositoryId = "${propertiesBean.properties[constants.PREFERENCE_REPOSITORY_ID]}"
     let imageTag = "${propertiesBean.properties[constants.PREFERENCE_IMAGE_TAG]}"
     let imageFullTag = "${propertiesBean.properties[constants.PREFERENCE_IMAGE_FULL_TAG]}"
+    let agentPool = $j("input[name='prop:${constants.PREFERENCE_AGENT_POOL}']").val()
 
     let optionDefault = {
         text: '',
@@ -318,6 +332,9 @@
                 accessSecret = this.value
                 doBind()
                 loadAll()
+            })
+            $j("input[name='prop:${constants.PREFERENCE_AGENT_POOL}']").change(function() {
+                agentPool = this.value
             })
         }
         $j(document).ready(ready)

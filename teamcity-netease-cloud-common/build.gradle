@@ -9,4 +9,5 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile 'com.squareup.okhttp3:okhttp:3.10.0'
     compile 'com.github.salomonbrys.kotson:kotson:2.5.0'
+    provided "org.jetbrains.teamcity:cloud-interface:$teamcityVersion"
 }

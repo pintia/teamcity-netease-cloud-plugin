@@ -1,24 +1,27 @@
 package com.hlyue.teamcity.agent.netease.web
 
 import com.google.gson.Gson
-import com.hlyue.teamcity.agent.netease.Constants
+import com.hlyue.teamcity.agent.netease.*
 import com.hlyue.teamcity.agent.netease.Constants.Companion.buildLogger
-import com.hlyue.teamcity.agent.netease.NeteaseOpenApiConnector
+import jetbrains.buildServer.BuildProject
 import jetbrains.buildServer.controllers.*
 import jetbrains.buildServer.serverSide.SBuildServer
-import jetbrains.buildServer.web.openapi.PluginDescriptor
-import jetbrains.buildServer.web.openapi.WebControllerManager
+import jetbrains.buildServer.serverSide.agentPools.*
+import jetbrains.buildServer.web.openapi.*
 import kotlinx.coroutines.*
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.ModelAndView
+import java.util.ArrayList
 import javax.servlet.AsyncContext
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import javax.servlet.http.*
 
 @Component
-class SettingsController(private val server: SBuildServer,
-                         private val pluginDescriptor: PluginDescriptor,
-                         private val manager: WebControllerManager): BaseController(server) {
+class SettingsController(
+  private val server: SBuildServer,
+  private val pluginDescriptor: PluginDescriptor,
+  private val manager: WebControllerManager,
+  private val agentPoolManager: AgentPoolManager
+): BaseController(server) {
 
   private companion object : Constants()
 
@@ -38,8 +41,15 @@ class SettingsController(private val server: SBuildServer,
   }
 
   fun doGet(request: HttpServletRequest, response: HttpServletResponse): ModelAndView {
+    val pools: MutableList<AgentPool> = ArrayList()
+    val projectId: String = request.getParameter("projectId")
+    if (BuildProject.ROOT_PROJECT_ID != projectId) {
+      pools.add(AgentPoolUtil.DUMMY_PROJECT_POOL)
+    }
+    pools.addAll(agentPoolManager.getProjectOwnedAgentPools(projectId))
     val mv = ModelAndView(myJspPath)
     mv.model["basePath"] = myHtmlPath
+    mv.model["agentPools"] = pools
     return mv
   }
 

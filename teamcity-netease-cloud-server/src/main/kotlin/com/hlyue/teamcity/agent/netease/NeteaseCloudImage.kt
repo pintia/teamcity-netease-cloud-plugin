@@ -12,7 +12,7 @@ class NeteaseCloudImage(private val specType: String,
 
   val instances = mutableListOf<NeteaseCloudInstance>()
 
-  override fun getAgentPoolId(): Int? = null
+  override fun getAgentPoolId(): Int? = cloudClient.agentPoolId
 
   override fun getName(): String = specType
 

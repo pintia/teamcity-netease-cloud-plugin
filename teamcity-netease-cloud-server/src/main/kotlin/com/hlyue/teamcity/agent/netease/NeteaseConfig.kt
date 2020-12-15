@@ -26,7 +26,9 @@ class NeteaseConfig private constructor(
 
   val createDisk: Boolean,
 
-  val diskSize: Int
+  val diskSize: Int,
+
+  val agentPoolId: Int
 
 ) {
 
@@ -47,6 +49,7 @@ class NeteaseConfig private constructor(
       val imageFullTag = getParameter(cloudClientParameters, constants.PREFERENCE_IMAGE_FULL_TAG)
       val createDisk = getParameter(cloudClientParameters, constants.PREFERENCE_CREATE_DISK)
       val diskSize = getParameter(cloudClientParameters, constants.PREFERENCE_DISK_SIZE)
+      val agentPoolId = getParameter(cloudClientParameters, constants.PREFERENCE_AGENT_POOL)
 
       return NeteaseConfig(
         accessKey = accessKey,
@@ -60,7 +63,8 @@ class NeteaseConfig private constructor(
         imageTag = imageTag,
         imageFullTag = imageFullTag,
         createDisk = createDisk.toInt() == 1,
-        diskSize = diskSize.toInt()
+        diskSize = diskSize.toInt(),
+        agentPoolId = agentPoolId.toInt()
       )
     }
 

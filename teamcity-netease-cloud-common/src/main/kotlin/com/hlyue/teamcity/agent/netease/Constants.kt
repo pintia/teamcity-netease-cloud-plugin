@@ -2,6 +2,7 @@ package com.hlyue.teamcity.agent.netease
 
 import com.github.salomonbrys.kotson.jsonObject
 import com.intellij.openapi.diagnostic.Logger
+import jetbrains.buildServer.clouds.CloudImageParameters
 import jetbrains.buildServer.log.Loggers
 
 open class Constants {
@@ -39,6 +40,8 @@ open class Constants {
   val PREFERENCE_CREATE_DISK = "createDisk"
 
   val PREFERENCE_DISK_SIZE = "diskSize"
+
+  val PREFERENCE_AGENT_POOL = CloudImageParameters.AGENT_POOL_ID_FIELD
 
   val REQUIREMENTS = mapOf(
     "ncs.n1.small2" to jsonObject(
