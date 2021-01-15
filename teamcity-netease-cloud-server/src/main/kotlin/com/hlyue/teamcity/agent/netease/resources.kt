@@ -202,6 +202,9 @@ def gen_curl(verbose, method, url, headers, body):
         args.append('--data')
         args.append(body)
     args.append(url)
+    # Fix new openssl issues when connecting to netease cloud.
+    args.append('--cipher')
+    args.append('DEFAULT@SECLEVEL=1')
     return args
 
 def call(args):
