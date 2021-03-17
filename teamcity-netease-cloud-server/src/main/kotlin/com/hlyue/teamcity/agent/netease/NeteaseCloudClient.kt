@@ -72,7 +72,8 @@ class NeteaseCloudClient(
             !workloadIds.contains(it.workloadId)
           }
         } catch (e: Exception) {
-          lastError = CloudErrorInfo("backgroudJob", responseString, e)
+//          lastError = CloudErrorInfo("backgroudJob", responseString, e)
+          logger.error("backgroundJob", e)
         }
       }
     }

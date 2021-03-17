@@ -3,7 +3,7 @@ plugins {
 }
 
 ext {
-    pluginVersion = "1.2.4"
+    pluginVersion = "1.2.5"
     teamcityVersion = findProperty("teamcityVersion") ?: "2019.1"
     def correctVersion = project.hasProperty('pluginVersion') && property('pluginVersion') ==~ /\d+\.\d+\.\d+.*/
     versionNumber = correctVersion ? property('pluginVersion') : 'SNAPSHOT-' + new Date().format('yyyyMMddHHmmss')
